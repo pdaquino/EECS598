@@ -1,0 +1,36 @@
+\documentclass[a4paper,12pt]{article}
+\begin{document}
+\title{Mixed Non-Bayesian and DeGroot Learning}
+\author{Pedro Barbuda\\pdaquino@umich.edu \and Dan Clark\\ddclark@umich.edu}
+\date{December 11, 2012}
+
+\maketitle
+
+\section{Introduction}
+
+\section{The Model}
+
+\subsection{The Network}
+
+(Mixed Non-Bayesian and DeGroot nodes)
+
+\subsection{States and Signals}
+
+We will represent the true state of the world as a probability 
+distribution $P_t(x) = m_{t}x, m \in [-2.0, 2.0]$ with support confined to $x \in [0,1]$.  The slope $m_t$ will be the defining characteristic of the distribution.  Thus the parameter $m_t$ is the ``true state of the world'' that each node is trying to determine.
+
+The signals received by nodes in a network will be samples drawn from $P_t$.
+
+\subsection{Representing Belief States}
+
+The foremost difficulty in combining the Non-Bayesian and DeGroot models is that belief of Non-Bayesian nodes is a probability distribution over a finite set of possible states of the world.  For a DeGroot node, belief is simply a single value in $\mathbf{R}$.  Therefore it is necessary to develop a conversion between the belief states of Non-Bayesian and DeGroot nodes.
+
+
+\subsubsection{Belief in Non-Bayesian Nodes}
+
+To represent a belief about the continuous slope value $m$ for a Non-Bayesian node we discretize $m$ in the following manner.  Let $\{\theta_0, \theta_1,...\theta_n\}, n < \infty$ be the set of belief states for each Non-Bayesian node, where $\theta_i$ correspons to the belief that the slope of $P_t$ is equal to 
+
+\subsubsection{Belief in Bayesian Nodes}
+
+
+\end{document}
