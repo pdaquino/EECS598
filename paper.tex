@@ -1,4 +1,5 @@
 \documentclass[a4paper,12pt]{article}
+\usepackage{amsmath} % For 'cases' curly brace
 \begin{document}
 \title{Mixed Non-Bayesian and DeGroot Learning}
 \author{Pedro Barbuda\\pdaquino@umich.edu \and Dan Clark\\ddclark@umich.edu}
@@ -16,21 +17,82 @@
 
 \subsection{States and Signals}
 
-We will represent the true state of the world as a probability 
-distribution $P_t(x) = m_{t}x, m \in [-2.0, 2.0]$ with support confined to $x \in [0,1]$.  The slope $m_t$ will be the defining characteristic of the distribution.  Thus the parameter $m_t$ is the ``true state of the world'' that each node is trying to determine.
+We will represent the state of the world as a probability distribution:
+\begin{equation}
+P^*(x)=\begin{cases}
+m^* \cdot x & 0 \le x \le 1 \\
+0, & \text{otherwise}
+\end{cases}
+\end{equation}
+The slope $\{ m^* \in \mathbf{R} : -2 \le m^* \le 2 \}$ will be the defining characteristic of the distribution.  We have chosen to bound $m^*$ between -2 and 2 so that the support of $P_t$  is always over $[0,1]$.  The value of the parameter $m^*$ is the ``true'' state that each node is trying to learn.
 
-The signals received by nodes in a network will be samples drawn from $P_t$.
+At each timestep $t$, every Non-Bayesian node $i$ will receive a signal $s_{i,t}$ which is a value drawn from $P_t$.  These observations will be used by the nodes in the network to construct a belief about $m^*$.
 
 \subsection{Representing Belief States}
 
-The foremost difficulty in combining the Non-Bayesian and DeGroot models is that belief of Non-Bayesian nodes is a probability distribution over a finite set of possible states of the world.  For a DeGroot node, belief is simply a single value in $\mathbf{R}$.  Therefore it is necessary to develop a conversion between the belief states of Non-Bayesian and DeGroot nodes.
+The foremost difficulty in combining the Non-Bayesian and DeGroot models is that belief of Non-Bayesian nodes is a probability distribution over a finite set of possible states of the world.
+
+For a DeGroot node $i$, we represent the belief state of $i$ at time t as a single value 
+$m_{i,t} \in \mathbf{R}$.
+
+
+
+Therefore it is necessary to develop a conversion between the belief states of Non-Bayesian and DeGroot nodes.
 
 
 \subsubsection{Belief in Non-Bayesian Nodes}
 
-To represent a belief about the continuous slope value $m$ for a Non-Bayesian node we discretize $m$ in the following manner.  Let $\{\theta_0, \theta_1,...\theta_n\}, n < \infty$ be the set of belief states for each Non-Bayesian node, where $\theta_i$ correspons to the belief that the slope of $P_t$ is equal to 
+To represent a belief about the continuous slope value $m*$ for a Non-Bayesian node we discretize $m$ in the following manner.  Let $\Theta = \{\theta_0, \theta_1,...\theta_n\}, n < \infty$ be the discrete set of possible states of the world over which each Non-Bayesian node holds a distribution of belief. Each $\theta_i$ corresponds to the belief that the slope of $P^*$ is
+\begin{equation} \label{eq:theta_meaning}
+m^* = \frac{4i}{n - 1} - 2
+\end{equation}
+As an example, if we take n = 21 belief states, then we have
+\begin{equation}
+\nonumber
+\begin{cases}
+& \theta_0: m^* = -2.0 \\
+& \theta_1: m^* = -1.9 \\
+& ... \\
+& \theta_{20}: m^* = 2.0
+\end{cases}
+\end{equation}
+For each Non-Bayesian node $i$, the belief at time $t$ that $\theta_i$ is the true state of the world is denoted by $\mu_{i,t}(\theta_i)$.  Thus $\{ \mu_{i,t}(\theta_1), \mu_{i,t}(\theta_2), ... \mu_{i,t}(\theta_n) \}$ is a probability distribution over the set of world states for fixed $i,t$.
 
-\subsubsection{Belief in Bayesian Nodes}
+\subsection{Updating DeGroot Belief}
+DeGroot nodes in our model do not directly receive signals; they act merely as message-passers in the network.  For the most part our DeGroot nodes behave in a fashion similarly to nodes in a standard DeGroot-style network.  That is, a DeGroot node's $i$'s belief of the true slope value $m^*$ is given at time $t+1$ as
+\begin{equation} \label{eq:degroot_update}
+m_{i,t+1} = \sum_{j \in N(i)} a_{ij}m_{j,t}
+\end{equation}
+where $N(i)$ denotes the neighbors of $i$.  $a_{ij}$ represents the level of ``trust'' that a DeGroot node $i$ has in neighbor $j$, such that
 
+\begin{equation}
+\nonumber
+\sum_{j \in N(i)} a_{ij} = 1
+\end{equation}
+for all DeGroot nodes $i$.  Thus the DeGroot update in equation \ref{eq:degroot_update} is simply a weighted average of its neighbors beliefs in the previous timestep.
+
+When a DeGroot node a Non-Bayesian neighbor performs an update it must obtain a value 
+$m_{j,t}$ for the belief of this node.  This is calculated as
+
+\begin{equation}
+m_{j,t} = \sum_{k=1}^n\mu_{j,t}(\theta_k)(\frac{4i}{n - 1} - 2)
+\end{equation}
+
+Here we are taking a weighted average of the $m^*$ value represented by each state $\theta_i$ as defined in equation \ref{eq:theta_meaning}, where the weights are given by $j$'s level of belief in each state.
+
+\subsection{Updating Non-Bayesian Belief}
+
+The update of a Non-Bayesian node in our model is handled similarly to the method laid out 
+in Jadbabaie et. al. % @todo[DDC] Figure out references system
+
+% [DDC] Just putting in the equations for the moment.
+
+\begin{equation}
+m_{i,t}(s_i) = \int_\Theta \ell_i(s_i|\theta)d\mu_{i,t}(\theta) = \sum_{i=1}^n \ell_i(s_i|\theta_i)\mu_{i,t}(\theta_i)
+\end{equation}
+
+\begin{equation}
+\mu_{i,t+1}(\theta_i) = a_{ii}\mu_{i,t}(\theta_i)\frac{\ell_i(\omega_{i,t+1}|\theta_i)}{m_{i,t}(\omega_{i,t+1})} + \sum_{j \in N(i)} a_{ij}\mu_{j,t}(\theta_i)
+\end{equation}
 
 \end{document}
