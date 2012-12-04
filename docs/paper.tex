@@ -22,14 +22,14 @@
 
 We will represent the state of the world as a probability distribution:
 \begin{equation}
-P^*(x)=\begin{cases}
-m^* \cdot x & 0 \le x \le 1 \\
+p^*(x)=\begin{cases}
+m^* \cdot x + \frac{1}{2}(2-m^*) & 0 \le x \le 1 \\
 0, & \text{otherwise}
 \end{cases}
 \end{equation}
-The slope $\{ m^* \in \mathbf{R} : -2 \le m^* \le 2 \}$ will be the defining characteristic of the distribution.  We have chosen to bound $m^*$ between -2 and 2 so that the support of $P_t$  is always over $[0,1]$.  The value of the parameter $m^*$ is the ``true'' state that each node is trying to learn.
+The slope $\{ m^* \in \mathbf{R} : -2 \le m^* \le 2 \}$ will be the defining characteristic of the distribution.  We have chosen to bound $m^*$ between -2 and 2 add the term $\frac{1}{2}(2-m^*)$ so that the support of $p^*(x)$  is always over $[0,1]$.  The value of the parameter $m^*$ is the ``true'' state that each node is trying to learn.
 
-At each timestep $t$, every Non-Bayesian node $i$ will receive a signal $s_{i,t}$ which is a value drawn from $P_t$.  These observations will be used by the nodes in the network to construct a belief about $m^*$.
+At each timestep $t$, every Non-Bayesian node $i$ will receive a signal $s_{i,t}$ which is a value drawn from $p^*(x)$.  These observations will be used by the nodes in the network to construct a belief about $m^*$.
 
 \subsection{Representing Belief States}
 
@@ -45,9 +45,10 @@ Therefore it is necessary to develop a conversion between the belief states of N
 
 \subsubsection{Belief in Non-Bayesian Nodes}
 
-To represent a belief about the continuous slope value $m*$ for a Non-Bayesian node we discretize $m$ in the following manner.  Let $\Theta = \{\theta_0, \theta_1,...\theta_n\}, n < \infty$ be the discrete set of possible states of the world over which each Non-Bayesian node holds a distribution of belief. Each $\theta_i$ corresponds to the belief that the slope of $P^*$ is
-\begin{equation} \label{eq:theta_meaning}
-m^* = \frac{4i}{n - 1} - 2
+To represent a belief about the continuous slope value $m*$ for a Non-Bayesian node we discretize $m$ in the following manner.  Let $\Theta = \{\theta_0, \theta_1,...\theta_n\}, n < \infty$ be the discrete set of possible states of the world over which each Non-Bayesian node holds a distribution of belief. Each $\theta_i$ corresponds to the belief that the slope of $p^*(x)$ is equal to $m_i$ where
+\begin{equation}
+\label{eq:theta_meaning}
+m_i = \frac{4i}{n - 1} - 2
 \end{equation}
 As an example, if we take n = 21 belief states, then we have
 \begin{equation}
@@ -63,7 +64,8 @@ For each Non-Bayesian node $i$, the belief at time $t$ that $\theta_i$ is the tr
 
 \subsection{Updating DeGroot Belief}
 DeGroot nodes in our model do not directly receive signals; they act merely as message-passers in the network.  For the most part our DeGroot nodes behave in a fashion similarly to nodes in a standard DeGroot-style network.  That is, a DeGroot node's $i$'s belief of the true slope value $m^*$ is given at time $t+1$ as
-\begin{equation} \label{eq:degroot_update}
+\begin{equation}
+\label{eq:degroot_update}
 m_{i,t+1} = \sum_{j \in N(i)} a_{ij}m_{j,t}
 \end{equation}
 where $N(i)$ denotes the neighbors of $i$.  $a_{ij}$ represents the level of ``trust'' that a DeGroot node $i$ has in neighbor $j$, such that
@@ -74,31 +76,68 @@ where $N(i)$ denotes the neighbors of $i$.  $a_{ij}$ represents the level of ``t
 \end{equation}
 for all DeGroot nodes $i$.  Thus the DeGroot update in equation \ref{eq:degroot_update} is simply a weighted average of its neighbors beliefs in the previous timestep.
 
-When a DeGroot node a Non-Bayesian neighbor performs an update it must obtain a value 
-$m_{j,t}$ for the belief of this node.  This is calculated as
+When a DeGroot node with a Non-Bayesian neighbor performs an update it must obtain a value 
+$m_{j,t}^\prime$ for the belief of this neighbor.  This is calculated as
 
 \begin{equation}
-m_{j,t} = \sum_{k=1}^n\mu_{j,t}(\theta_k)(\frac{4i}{n - 1} - 2)
+m_{j,t}^\prime = \sum_{k=1}^n\mu_{j,t}(\theta_k)(\frac{4i}{n - 1} - 2)
 \end{equation}
 
-Here we are taking a weighted average of the $m^*$ value represented by each state $\theta_i$ as defined in equation \ref{eq:theta_meaning}, where the weights are given by $j$'s level of belief in each state.
+Here we are taking a weighted average of the $m^*$ value represented by each state $\theta_i$ as defined in equation~\ref{eq:theta_meaning}, where the weights are given by $j$'s level of belief in each state.
 
 \subsection{Updating Non-Bayesian Belief}
 
 The update of a Non-Bayesian node in our model is handled similarly to the method laid out 
-in Jadbabaie et. al. % @todo[DDC] Figure out references system
-
-% [DDC] Just putting in the equations for the moment.
+in \cite{Jadbabaie2012}.  We denote the belief of a node $i$ that it will receive the signal $s_i$ at time $t$ as $m_{i,t}(s_i)$, defined as follows:
 
 \begin{equation}
 m_{i,t}(s_i) = \int_\Theta \ell_i(s_i|\theta)d\mu_{i,t}(\theta) = \sum_{i=1}^n \ell_i(s_i|\theta_i)\mu_{i,t}(\theta_i)
 \end{equation}
 
+% @todo[DDC] More detail for derivation/explanation of likelihood?
+In this case the likelihood function $\ell_i(s_i|\theta_i)$ can be obtained from the probability distribution function represented by the belief state $\theta_i$.
+
+\begin{equation}
+\label{eq:likelihood}
+\ell_i(s_i|\theta_i) = m_i s_i + \frac{1}{2}(2 - m_i)
+\end{equation}
+where $m_i$ is defined as in equation~\ref{eq:theta_meaning}.
+
+The update of a node's belief in each state $\theta_i$ for a given time period $t$ is then given by
+
 \begin{equation}
 \mu_{i,t+1}(\theta_i) = a_{ii}\mu_{i,t}(\theta_i)\frac{\ell_i(\omega_{i,t+1}|\theta_i)}{m_{i,t}(\omega_{i,t+1})} + \sum_{j \in N(i)} a_{ij}\mu_{j,t}(\theta_i)
 \end{equation}
 
+Here the first term is the Bayesian update of the belief $\mu_{i,t}(\theta_i)$ after observing the signal $\omega_{i,t+1}$ multiplied by the node's self reliance $a_{ii}$.  The summation is the linear incorporation of the beilefs of $i$'s neighbors.
 
+This update differs from the previous work in two major ways.  Firstly, we provide each Non-Bayesian node with only a single signal per timestep, where this signal is a single draw from the probability distribution $p^*(x)$.
+
+Secondly, we must define $\mu_{j,t}(\theta_i)$ when $j$ is a DeGroot node.  We consider two methods for doing so, defined in sections \ref{sec:draw_from_degroot} and \ref{sec:likelihood_metric} respectively.
+
+\subsubsection{Belief Distribution from Draw of Probability Distribution}
+\label{sec:draw_from_degroot}
+
+The first method that we consider for converting a DeGroot node $j$'s belief to a prior which can be included in a Non-Bayesian node $i$'s belief update involves generating a probability distribution from the $j$'s current belief and drawing from this distribution.  For each DeGroot neighbor of $i$ at time $t$ we define the probability distribution
+\begin{equation}
+p_{j,t}(x)=\begin{cases}
+m_{j,t} x + \frac{1}{2}(2-m^*) & 0 \le x \le 1 \\
+0, & \text{otherwise}
+\end{cases}
+\end{equation}
+
+This is simply the distribution which $j$ believes to be the state of the world.  We then draw a single signal $s_{j,t}^\prime$ from this distribution.  We create a belief distribution $\mu_{j,t}^\prime$ from $s_{j,t}^\prime$ by performing a Bayesian-style update with equal priors.
+
+\begin{equation}
+\mu_{j,t}^\prime(\theta_i) = \frac{\ell_i(s_{j,t}^\prime|\theta_i)}{m_{i,t}(s_{j,t}^\prime)}
+\end{equation}
+
+This generated belief distribution $\mu_{j,t}^\prime$ is then used as
+
+% @todo[DDC] Still working on this section
+
+\subsubsection{Belief Distribution from Likelihood Distance Metric}
+\label{sec:likelihood_metric}
 
 \bibliographystyle{plain}
 \bibliography{eecs598Report}
