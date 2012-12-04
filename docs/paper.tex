@@ -9,6 +9,9 @@
 
 \section{Introduction}
 
+\cite{Jadbabaie2012}
+\cite{DeGroot1974}
+
 \section{The Model}
 
 \subsection{The Network}
@@ -94,5 +97,10 @@ m_{i,t}(s_i) = \int_\Theta \ell_i(s_i|\theta)d\mu_{i,t}(\theta) = \sum_{i=1}^n \
 \begin{equation}
 \mu_{i,t+1}(\theta_i) = a_{ii}\mu_{i,t}(\theta_i)\frac{\ell_i(\omega_{i,t+1}|\theta_i)}{m_{i,t}(\omega_{i,t+1})} + \sum_{j \in N(i)} a_{ij}\mu_{j,t}(\theta_i)
 \end{equation}
+
+
+
+\bibliographystyle{plain}
+\bibliography{eecs598Report}
 
 \end{document}
