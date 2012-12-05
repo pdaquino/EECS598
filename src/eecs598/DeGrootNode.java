@@ -1,14 +1,17 @@
 package eecs598;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 import edu.uci.ics.jung.graph.Graph;
+import eecs598.probability.Distribution;
 import eecs598.util.NotImplementedException;
 
 public class DeGrootNode implements Node {
 	
 	@Override
-	public void newSignal(Graph<Node, Edge> graph, double signal) {
+	public void newSignal(Collection<Node> neighbors, double signal) {
 		// TODO Auto-generated method stub
 		//
 		// This is probably a good time to iterate over this node's neighbors
@@ -29,6 +32,12 @@ public class DeGrootNode implements Node {
 		// for us to change the algorithm later. Perhaps we should use a new
 		// class for that.
 		//
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public void setPossibleDistributions(List<Distribution> distributions) {
+		// TODO Auto-generated method stub
 		throw new NotImplementedException();
 	}
 

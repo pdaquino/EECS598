@@ -1,8 +1,10 @@
 package eecs598;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
-import edu.uci.ics.jung.graph.Graph;
+import eecs598.probability.Distribution;
 
 public interface Node {
 	
@@ -11,11 +13,17 @@ public interface Node {
 	 * We pass the graph in case nodes want to use information from neighbors.
 	 * @param signal
 	 */
-	public void newSignal(Graph<Node, Edge> graph, double signal);
+	public void newSignal(Collection<Node> neighbors, double signal);
 	
 	/**
 	 * Returns the node's current set of beliefs on possible states.
 	 * @return
 	 */
 	public HashMap<Double, Double> getBeliefs();
+	
+	/**
+	 * Sets the list of possible distributions.
+	 * @param distributions
+	 */
+	public void setPossibleDistributions(List<Distribution> distributions);
 }

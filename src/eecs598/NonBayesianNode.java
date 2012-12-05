@@ -1,9 +1,13 @@
 package eecs598;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import edu.uci.ics.jung.graph.Graph;
-import eecs598.util.NotImplementedException;
+import eecs598.probability.Distribution;
+import eecs598.probability.ProbabilityUtil;
 
 public class NonBayesianNode implements Node {
 
@@ -13,29 +17,166 @@ public class NonBayesianNode implements Node {
 	 */
 	private HashMap<Double, Double> beliefs;
 	
-	//
-	// When NB nodes are constructed, we need to pass it
-	// all the possible Distributions, and then we extract the
-	// possible parameters and put them in the beliefs map with
-	// a uniform prior.
-	//
+	/**
+	 * An order list of possible distributions.
+	 */
+	private List<Distribution> distributions;
+	
+	private int id;
+	
+	public NonBayesianNode(int id, List<Distribution> possibleDistributions) {
+		this.id = id;
+		setPossibleDistributions(possibleDistributions);
+	}
 	
 	@Override
-	public void newSignal(Graph<Node, Edge> graph, double signal) {
-		// TODO Auto-generated method stub
+	public void newSignal(Collection<Node> neighbors, double signal) {
 		//
 		// Perform the bayesian update + the degroot-style averaging of neighbors.
 		//
-		throw new NotImplementedException();
+		doBayesianUpdate(neighbors, signal);
+		ProbabilityUtil.normalizeToOne(beliefs);
+		doNonBayesianUpdate(neighbors, signal);
+		ProbabilityUtil.normalizeToOne(beliefs);
+	}
+	
+	protected void doBayesianUpdate(Collection<Node> neighbors, double signal) {
+		//
+		// Let w be the signal and T a distribution that might have generated w.
+		//
+		// P(T | w) = (P(w | T)/P(w))P(T)
+		//
+		// The first term is proportional to the pdf of T. The second is the prior,
+		// currently in the beliefs map. We have to normalize the pdfs in order to
+		// get P(w|T)/P(W).
+		//
+		
+		//
+		// Get p(w|T)/p(w).
+		//
+		List<Double> pdfsAtW = new ArrayList<Double>(distributions.size());
+		for(Distribution dist : distributions) {
+			double pdf = dist.pdf(signal); 
+			pdfsAtW.add(pdf);
+		}
+		
+		List<Double> normalizedPdfs = ProbabilityUtil.normalizeToOne(pdfsAtW);
+		
+		//
+		// Update the belief as u_{t+1} = p(w|T)*u_{t}/p(w).
+		//
+		for(int i = 0; i < pdfsAtW.size(); i++) {
+			Distribution dist = distributions.get(i);
+			double prior = beliefs.get(dist.getParameter());
+			double updatedBelief = normalizedPdfs.get(i) * prior;
+			double selfInfluence = getNeighborInfluence(this, neighbors);
+			beliefs.put(dist.getParameter(), selfInfluence * updatedBelief);
+		}
+	}
+
+	protected void doNonBayesianUpdate(Collection<Node> neighbors, double signal) { 
+		//
+		// Weighted update of our beliefs based on every neighbor's beliefs.
+		//
+		for(Node neighbor : neighbors) {
+			
+			if(neighbor.equals(this)) {
+				throw new IllegalStateException("Self-loop in node " + toString() + ". Self-loops are not allowed.");
+			}
+				
+			HashMap<Double, Double> neighborsBeliefs = neighbor.getBeliefs();
+			double influence = getNeighborInfluence(neighbor, neighbors);
+			
+			//
+			// Update one belief at a time.
+			//
+			for(Map.Entry<Double, Double> paramBeliefPair : neighborsBeliefs.entrySet()) {
+				double parameter = paramBeliefPair.getKey();
+				double belief = paramBeliefPair.getValue();
+				double weightedNeighborBelief = influence * belief;
+				//
+				// Update our belief by adding the weighted neighbor's.
+				//
+				beliefs.put(parameter, beliefs.get(parameter) + weightedNeighborBelief);
+			}
+		}
+	}
+	
+	/**
+	 * Returns the influence, between 0 and 1, that a given neihgbor exerts over this node.
+	 * For every node, the sum of all its neighbors' influences must be 1. We assume that
+	 * every node has a self-edge so that it can influence itself.
+	 * @param neighbor The neighbor whose influence will be returned.
+	 * @return
+	 */
+	protected double getNeighborInfluence(Node neighbor, Collection<Node> neighbors) {
+		// TODO I'm not too happy with the design here... It's going to be a pain
+		// we ever really want to have different distributions. This logic will
+		// pretty much be replicated in the DeGroot node too. Maybe we should
+		// create a new class for assigning influence values?
+		
+		//
+		// We just have a uniform distribution.
+		//
+		if(neighbors.contains(this)) {
+			throw new IllegalStateException("Self-loop in node " + toString() + ". Self-loops are not allowed.");
+		}
+		int neighborCount = neighbors.size() + 1; // +1 accounts for self-edge
+		return 1.0/neighborCount;		
+	}
+
+	public List<Distribution> getDistributions() {
+		return distributions;
+	}
+
+	public void setPossibleDistributions(List<Distribution> possibleDistributions) {
+		this.distributions = possibleDistributions;
+
+		this.beliefs = new HashMap<>(possibleDistributions.size());
+		double uniformPrior = 1.0/possibleDistributions.size();
+
+		for(Distribution dist : possibleDistributions) {
+			this.beliefs.put(dist.getParameter(), uniformPrior);
+		}
 	}
 
 	@Override
 	public HashMap<Double, Double> getBeliefs() {
 		/**
-		 * Returning a shallow copy be fine -- I don't think we will update
+		 * Returning a shallow copy should be fine -- I don't think we will update
 		 * the Doubles inside of the HashMap.
 		 */
 		return new HashMap<>(beliefs);
 	}
 
+	public int getId() {
+		return id;
+	}
+
+	@Override
+	public String toString() {
+		return "NonBayesianNode " + id + " [" + beliefs + "]";
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		NonBayesianNode other = (NonBayesianNode) obj;
+		if (id != other.id)
+			return false;
+		return true;
+	}	
 }

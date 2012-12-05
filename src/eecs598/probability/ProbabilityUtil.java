@@ -1,9 +1,10 @@
 package eecs598.probability;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-
-import eecs598.util.NotImplementedException;
 
 /**
  * Helper class for simple probability methods like getting the expected value.
@@ -31,5 +32,37 @@ public class ProbabilityUtil {
 			}
 		}
 		return expectedValue;
+	}
+	
+	/**
+	 * Normalizes a list of values such that their sum adds up to one.
+	 * @return the list of normalized values.
+	 */
+	public static List<Double> normalizeToOne(List<Double> values) {
+		double sum = sum(values);
+		List<Double> normalizedValues = new ArrayList<Double>(values.size());
+		for(Double value : values) {
+			normalizedValues.add(value / sum);
+		}
+		return normalizedValues;
+	}
+	
+	/**
+	 * Normalizes a list of values such that their sum adds up to one.
+	 * @return the list of normalized values.
+	 */
+	public static void normalizeToOne(HashMap<? extends Object, Double> values) {
+		double sum = sum(values.values());
+		for(Map.Entry<? extends Object, Double> entry : values.entrySet()) {
+			entry.setValue(entry.getValue() / sum);
+		}
+	}
+	
+	private static double sum(Collection<Double> values) {
+		double sum = 0.0;
+		for(Double value : values) {
+			sum += value;
+		}
+		return sum;
 	}
 }
