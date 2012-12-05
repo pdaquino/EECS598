@@ -9,6 +9,13 @@ import eecs598.util.NotImplementedException;
  *
  */
 public class TrapezoidDistribution implements Distribution {
+	
+	private double m = 0.0;
+	
+	public TrapezoidDistribution(double m) {
+		super();
+		this.m = m;
+	}
 
 	@Override
 	public double draw() {
@@ -24,8 +31,7 @@ public class TrapezoidDistribution implements Distribution {
 
 	@Override
 	public double getParameter() {
-		// TODO Auto-generated method stub
-		throw new NotImplementedException();
+		return m;
 	}
 
 }

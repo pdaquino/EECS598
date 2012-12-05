@@ -13,6 +13,8 @@ import eecs598.Edge;
 import eecs598.Node;
 import eecs598.NonBayesianNode;
 import eecs598.probability.Distribution;
+import eecs598.test.helpers.TestDistributions;
+import eecs598.test.helpers.TestGraphs;
 
 public class NonBayesianNodeTest extends NonBayesianNode {
 

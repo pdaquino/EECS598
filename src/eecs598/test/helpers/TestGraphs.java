@@ -1,4 +1,4 @@
-package eecs598.test;
+package eecs598.test.helpers;
 
 import java.util.ArrayList;
 
