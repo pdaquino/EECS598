@@ -1,5 +1,6 @@
 \documentclass[a4paper,12pt]{article}
 \usepackage{amsmath} % For 'cases' curly brace
+\usepackage{amsfonts} % For bold number set font
 \begin{document}
 \title{Mixed Non-Bayesian and DeGroot Learning}
 \author{Pedro d'Aquino\\pdaquino@umich.edu \and Dan Clark\\ddclark@umich.edu}
@@ -9,6 +10,9 @@
 
 \section{Introduction}
 
+\cite{Jadbabaie2012}
+\cite{DeGroot1974}
+
 \section{The Model}
 
 \subsection{The Network}
@@ -17,36 +21,41 @@
 
 \subsection{States and Signals}
 
-We will represent the state of the world as a probability distribution:
+We will consider the state of the world to be a probability distribution $p^*(t) \in \mathbb{P}$.  $\mathbb{P}$ is a pre-defined class of distributions where each  $p^*(t) \in \mathbb{P}$ is distinguishable by a single parameter.  This single parameter $m^*$ where $\{m^* \in \mathbb{R}: m_{min} <= m^* <= m_{max} \}$  will be the state which the nodes in the network are attempting to learn.  That is, $m^*$ is the ``true'' state of the world.  \emph{A priori}, the nodes know the class of distribution but not the specific value of $m^*$; only that it lies uniformly in the range $[m_{min}, m_{max}]$.
+
+Our model allows for $\mathbb{P}$ to be any class of probability distribution as long as it can be completely specified by a single parameter $m^*$.  Examples include the Poisson distribution with parameter $m^*$ and Gaussian distribution with mean $m^*$ and constant variance.  We also introduce a trapezoidal probability distribution in section~\ref{sec:trapezoidal_distribution} which serves as a valid choice for $\mathbb{P}$.
+
+At each timestep $t$, every Non-Bayesian node $i$ will receive a signal $s_{i,t}$ which is a value drawn from $p^*(x)$.  These observations will be used by the nodes in the network to construct a belief about $m^*$.
+
+\subsubsection{The Trapezoidal Distribution}
+\label{sec:trapezoidal_distribution}
+
+As an example of a class of distributions which can be used in our model we present the following trapezoidal distribution.
+
 \begin{equation}
-P^*(x)=\begin{cases}
-m^* \cdot x & 0 \le x \le 1 \\
+p^*(x)=\begin{cases}
+m^* \cdot x + \frac{1}{2}(2-m^*) & 0 \le x \le 1 \\
 0, & \text{otherwise}
 \end{cases}
 \end{equation}
-The slope $\{ m^* \in \mathbf{R} : -2 \le m^* \le 2 \}$ will be the defining characteristic of the distribution.  We have chosen to bound $m^*$ between -2 and 2 so that the support of $P_t$  is always over $[0,1]$.  The value of the parameter $m^*$ is the ``true'' state that each node is trying to learn.
 
-At each timestep $t$, every Non-Bayesian node $i$ will receive a signal $s_{i,t}$ which is a value drawn from $P_t$.  These observations will be used by the nodes in the network to construct a belief about $m^*$.
+% @todo[DDC] Graph/figure of this would probably be good to have.
+
+The slope $\{ m^* \in \mathbb{R} : m_{min} = -2 \le m^* \le 2 = m_{max} \}$ will be the defining characteristic of the distribution.  We have chosen to bound $m^*$ between -2 and 2 and add the term $\frac{1}{2}(2-m^*)$ so that the support of $p^*(x)$  is always over $[0,1]$.
 
 \subsection{Representing Belief States}
 
-The foremost difficulty in combining the Non-Bayesian and DeGroot models is that belief of Non-Bayesian nodes is a probability distribution over a finite set of possible states of the world.
-
-For a DeGroot node $i$, we represent the belief state of $i$ at time t as a single value 
-$m_{i,t} \in \mathbf{R}$.
-
-
-
-Therefore it is necessary to develop a conversion between the belief states of Non-Bayesian and DeGroot nodes.
-
+For a DeGroot node $i$, we represent the belief state of $i$ at time $t$ as a single value 
+$m_{i,t} \in \mathbb{R}$.  However, belief of Non-Bayesian nodes is a probability distribution over a finite set of possible states of the world.  There is thus a tension between these two schemes and it is necessary to develop a conversion between the belief states of Non-Bayesian and DeGroot nodes.
 
 \subsubsection{Belief in Non-Bayesian Nodes}
 
-To represent a belief about the continuous slope value $m*$ for a Non-Bayesian node we discretize $m$ in the following manner.  Let $\Theta = \{\theta_0, \theta_1,...\theta_n\}, n < \infty$ be the discrete set of possible states of the world over which each Non-Bayesian node holds a distribution of belief. Each $\theta_i$ corresponds to the belief that the slope of $P^*$ is
-\begin{equation} \label{eq:theta_meaning}
-m^* = \frac{4i}{n - 1} - 2
+To represent a belief about the continuous slope value $m^*$ for a Non-Bayesian node we discretize $m$ in the following manner.  Let $\Theta = \{\theta_0, \theta_1,...\theta_n\}, n < \infty$ be the discrete set of possible states of the world over which each Non-Bayesian node holds a distribution of belief. Each $\theta_k$ corresponds to the belief that the slope of $p^*(x)$ is equal to $m_k$ where
+\begin{equation}
+\label{eq:theta_meaning}
+\hat{m_k} = \frac{(m_{max} - m_{min})k}{n - 1} + m_{min}
 \end{equation}
-As an example, if we take n = 21 belief states, then we have
+As an example, if we take $n = 21$ belief states, $m_{min} = -2$, and $m_{max} = 2$, then we have
 \begin{equation}
 \nonumber
 \begin{cases}
@@ -56,11 +65,12 @@ As an example, if we take n = 21 belief states, then we have
 & \theta_{20}: m^* = 2.0
 \end{cases}
 \end{equation}
-For each Non-Bayesian node $i$, the belief at time $t$ that $\theta_i$ is the true state of the world is denoted by $\mu_{i,t}(\theta_i)$.  Thus $\{ \mu_{i,t}(\theta_1), \mu_{i,t}(\theta_2), ... \mu_{i,t}(\theta_n) \}$ is a probability distribution over the set of world states for fixed $i,t$.
+For each Non-Bayesian node $i$, the belief at time $t$ that $\theta_k$ is the true state of the world is denoted by $\mu_{i,t}(\theta_k)$.  Thus $\{ \mu_{i,t}(\theta_1), \mu_{i,t}(\theta_2), ... \mu_{i,t}(\theta_n) \}$ is a probability distribution over the set of world states for fixed $i,t$.
 
-\subsection{Updating DeGroot Belief}
+\subsection{Learning in DeGroot Nodes}
 DeGroot nodes in our model do not directly receive signals; they act merely as message-passers in the network.  For the most part our DeGroot nodes behave in a fashion similarly to nodes in a standard DeGroot-style network.  That is, a DeGroot node's $i$'s belief of the true slope value $m^*$ is given at time $t+1$ as
-\begin{equation} \label{eq:degroot_update}
+\begin{equation}
+\label{eq:degroot_update}
 m_{i,t+1} = \sum_{j \in N(i)} a_{ij}m_{j,t}
 \end{equation}
 where $N(i)$ denotes the neighbors of $i$.  $a_{ij}$ represents the level of ``trust'' that a DeGroot node $i$ has in neighbor $j$, such that
@@ -69,30 +79,92 @@ where $N(i)$ denotes the neighbors of $i$.  $a_{ij}$ represents the level of ``t
 \nonumber
 \sum_{j \in N(i)} a_{ij} = 1
 \end{equation}
-for all DeGroot nodes $i$.  Thus the DeGroot update in equation \ref{eq:degroot_update} is simply a weighted average of its neighbors beliefs in the previous timestep.
+for all DeGroot nodes $i$.  Thus the DeGroot update in equation \ref{eq:degroot_update} is simply a weighted average of its neighbors' beliefs in the previous timestep.
 
-When a DeGroot node a Non-Bayesian neighbor performs an update it must obtain a value 
-$m_{j,t}$ for the belief of this node.  This is calculated as
+When a DeGroot node with a Non-Bayesian neighbor performs an update it must obtain a value 
+$m_{j,t}^\prime$ for the belief of this neighbor.  This is calculated as
 
 \begin{equation}
-m_{j,t} = \sum_{k=1}^n\mu_{j,t}(\theta_k)(\frac{4i}{n - 1} - 2)
+m_{j,t}^\prime = \sum_{k=1}^n\mu_{j,t}(\theta_k)\hat{m_k}
 \end{equation}
 
-Here we are taking a weighted average of the $m^*$ value represented by each state $\theta_i$ as defined in equation \ref{eq:theta_meaning}, where the weights are given by $j$'s level of belief in each state.
+Here we are taking a weighted average of the $\hat{m_k}$ slope values represented by each state $\theta_k$ as defined in equation~\ref{eq:theta_meaning}, where the weights are given by $j$'s level of belief in each state.
 
-\subsection{Updating Non-Bayesian Belief}
+\subsection{Learning in Non-Bayesian Nodes}
 
 The update of a Non-Bayesian node in our model is handled similarly to the method laid out 
-in Jadbabaie et. al. % @todo[DDC] Figure out references system
-
-% [DDC] Just putting in the equations for the moment.
+in \cite{Jadbabaie2012}.  We denote the belief of a node $i$ that it will receive the signal $s_i$ at time $t$ as $m_{i,t}(s_i)$, defined as follows:
 
 \begin{equation}
-m_{i,t}(s_i) = \int_\Theta \ell_i(s_i|\theta)d\mu_{i,t}(\theta) = \sum_{i=1}^n \ell_i(s_i|\theta_i)\mu_{i,t}(\theta_i)
+m_{i,t}(s_i) = \int_\Theta \ell_i(s_i|\theta)d\mu_{i,t}(\theta) = \sum_{k=1}^n \ell_i(s_i|\theta_k)\mu_{i,t}(\theta_k)
 \end{equation}
 
+% @todo[DDC] More detail for derivation/explanation of likelihood?
+The likelihood function $\ell_i(s_i|\theta_k)$ can be obtained from the probability distribution function represented by the belief state $\theta_k$.  As an example, for the trapezoidal distribution described in section~\ref{sec:trapezoidal_distribution}, the likelihood function would be
+
 \begin{equation}
-\mu_{i,t+1}(\theta_i) = a_{ii}\mu_{i,t}(\theta_i)\frac{\ell_i(\omega_{i,t+1}|\theta_i)}{m_{i,t}(\omega_{i,t+1})} + \sum_{j \in N(i)} a_{ij}\mu_{j,t}(\theta_i)
+\label{eq:likelihood}
+\ell_i(s_i|\theta_k) \propto \hat{m_k} s_i + \frac{1}{2}(2 - \hat{m_k})
 \end{equation}
+where $\hat{m_k}$ is defined as in equation~\ref{eq:theta_meaning}.
+
+The update of a node's belief in each state $\theta_k$ for a given time period $t$ is then given by
+
+\begin{equation}
+\label{eq:non_bayesian_update}
+\mu_{i,t+1}(\theta_k) = a_{ii}\mu_{i,t}(\theta_k)\frac{\ell_i(\omega_{i,t+1}|\theta_k)}{m_{i,t}(\omega_{i,t+1})} + \sum_{j \in N(i)} a_{ij}\mu_{j,t}(\theta_k)
+\end{equation}
+
+Here the first term is the Bayesian update of the belief $\mu_{i,t}(\theta_k)$ after observing the signal $\omega_{i,t+1}$, multiplied by the node's self reliance $a_{ii}$.  The summation is the linear incorporation of the beliefs of $i$'s neighbors.
+
+This update differs from the previous work in two major ways.  Firstly, we provide each Non-Bayesian node with only a single signal per timestep, where this signal is a single draw from the probability distribution $p^*(x)$.
+
+Secondly, we must define $\mu_{j,t}(\theta_k)$ when $j$ is a DeGroot node.  We consider two methods for doing so, defined in sections \ref{sec:draw_from_degroot} and \ref{sec:likelihood_metric} respectively.
+
+\subsubsection{Belief Distribution from Draw of Probability Distribution}
+\label{sec:draw_from_degroot}
+
+We require a method for converting a DeGroot node $j$'s belief $m_{j,t} \in \mathbb{R}$ to a series of priors which can be included in a Non-Bayesian node $i$'s belief update.  The first method we consider involves generating a probability distribution $p_{j,t}$ from $j$'s belief at time $t$ and drawing from this distribution.  The generated distribution is the $p_{j,t} \in \mathbb{P}$ where $j$'s belief $m_{j,t}$ is the single parameter defining the distribution.  If $\mathbb{P}$ is the trapezoidal distribution defined in section~\ref{sec:trapezoidal_distribution}, then for each DeGroot neighbor of $i$ at time $t$ we have
+
+\begin{equation}
+p_{j,t}(x)=\begin{cases}
+m_{j,t} x + \frac{1}{2}(2-m_{j,t}) & 0 \le x \le 1 \\
+0, & \text{otherwise}
+\end{cases}
+\end{equation}
+
+This is simply the distribution which $j$ believes to be the state of the world.  We then draw a single signal $s_{j,t}^\prime$ from this distribution.  We create a belief distribution $\mu_{j,t}^\prime$ from $s_{j,t}^\prime$ by performing a Bayesian-style update with equal priors.
+
+\begin{equation}
+\mu_{j,t}^\prime(\theta_k) = \frac{\ell_i(s_{j,t}^\prime|\theta_k)}{\sum_{i=1}^{n} \ell_i(s_{j,t}^\prime|\theta_i)}
+\end{equation}
+
+This generated belief distribution $\mu_{j,t}^\prime$ is then used for the values of $\mu_{j,t}(\theta_k)$ for the DeGroot node $j$ in the Non-Bayesian update of equation~\ref{eq:non_bayesian_update}.
+
+\subsubsection{Belief Distribution from Likelihood Distance Metric}
+\label{sec:likelihood_metric}
+
+The second method we consider for creating a probability distribution over the set of belief states $\Theta$ is to define an exponential distance metric such that
+
+\begin{equation}
+\mu_{j,t}^\prime(\theta_k) \propto e^{-(m_{j,t}-\hat{m_k})^2}
+\end{equation}
+where $\mu_{j,t}^\prime$ is the belief distribution which is used for the DeGroot node $j$'s values of $\mu_{j,t}(\theta_k)$ in the Non-Bayesian update of equation~\ref{eq:non_bayesian_update}.
+
+Since $\mu_{j,t}^\prime$ must be a probability distribution we must normalize the values for each state with the value
+
+\begin{equation}
+q_{j,t} = \sum_{k=1}^n e^{-(m_{j,t}-\hat{m_k})^2}
+\end{equation}
+
+Thus the calculation to create the DeGroot node's level of belief in each state $\theta_k$ is given by
+
+\begin{equation}
+\mu_{j,t}^\prime(\theta_k) = e^{-(m_{j,t}-\hat{m_i})^2} / q_{j,t}
+\end{equation}
+
+
+\bibliographystyle{plain}
+\bibliography{eecs598Report}
 
 \end{document}
