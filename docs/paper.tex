@@ -1,5 +1,6 @@
 \documentclass[a4paper,12pt]{article}
 \usepackage{amsmath} % For 'cases' curly brace
+\usepackage{amsfonts} % For bold number set font
 \begin{document}
 \title{Mixed Non-Bayesian and DeGroot Learning}
 \author{Pedro d'Aquino\\pdaquino@umich.edu \and Dan Clark\\ddclark@umich.edu}
@@ -20,7 +21,17 @@
 
 \subsection{States and Signals}
 
-We will represent the state of the world as a probability distribution:
+We will consider the state of the world to be a probability distribution $p^*(t) \in \mathbb{P}$.  $\mathbb{P}$ is a pre-defined class of distributions where each  $p^*(t) \in \mathbb{P}$ is distinguishable by a single parameter.  This single parameter $m^*$ where $\{m^* \in \mathbb{R}: m_{min} <= m^* <= m_{max} \}$  will be the state which the nodes in the network are attempting to learn.  That is, $m^*$ is the ``true'' state of the world.  \emph{A priori}, the nodes know the class of distribution but not the specific value of $m^*$; only that it lies uniformly in the range $[m_{min}, m_{max}]$.
+
+Our model allows for $\mathbb{P}$ to be any class of probability distribution as long as it can be completely specified by a single parameter $m^*$.  Examples include the Poisson distribution with parameter $m^*$ and Gaussian distribution with mean $m^*$ and constant variance.  We also introduce a trapezoidal probability distribution in section~\ref{sec:trapezoidal_distribution} which serves as a valid choice for $\mathbb{P}$.
+
+At each timestep $t$, every Non-Bayesian node $i$ will receive a signal $s_{i,t}$ which is a value drawn from $p^*(x)$.  These observations will be used by the nodes in the network to construct a belief about $m^*$.
+
+\subsubsection{The Trapezoidal Distribution}
+\label{sec:trapezoidal_distribution}
+
+As an example of a class of distributions which can be used in our model we present the following trapezoidal distribution.
+
 \begin{equation}
 p^*(x)=\begin{cases}
 m^* \cdot x + \frac{1}{2}(2-m^*) & 0 \le x \le 1 \\
@@ -30,23 +41,21 @@ m^* \cdot x + \frac{1}{2}(2-m^*) & 0 \le x \le 1 \\
 
 % @todo[DDC] Graph/figure of this would probably be good to have.
 
-The slope $\{ m^* \in \mathbf{R} : -2 \le m^* \le 2 \}$ will be the defining characteristic of the distribution.  We have chosen to bound $m^*$ between -2 and 2 and add the term $\frac{1}{2}(2-m^*)$ so that the support of $p^*(x)$  is always over $[0,1]$.  The value of the parameter $m^*$ is the ``true'' state that each node is trying to learn.
-
-At each timestep $t$, every Non-Bayesian node $i$ will receive a signal $s_{i,t}$ which is a value drawn from $p^*(x)$.  These observations will be used by the nodes in the network to construct a belief about $m^*$.
+The slope $\{ m^* \in \mathbb{R} : m_{min} = -2 \le m^* \le 2 = m_{max} \}$ will be the defining characteristic of the distribution.  We have chosen to bound $m^*$ between -2 and 2 and add the term $\frac{1}{2}(2-m^*)$ so that the support of $p^*(x)$  is always over $[0,1]$.
 
 \subsection{Representing Belief States}
 
 For a DeGroot node $i$, we represent the belief state of $i$ at time $t$ as a single value 
-$m_{i,t} \in \mathbf{R}$.  However, belief of Non-Bayesian nodes is a probability distribution over a finite set of possible states of the world.  There is thus a tension between these two schemes and it is necessary to develop a conversion between the belief states of Non-Bayesian and DeGroot nodes.
+$m_{i,t} \in \mathbb{R}$.  However, belief of Non-Bayesian nodes is a probability distribution over a finite set of possible states of the world.  There is thus a tension between these two schemes and it is necessary to develop a conversion between the belief states of Non-Bayesian and DeGroot nodes.
 
 \subsubsection{Belief in Non-Bayesian Nodes}
 
 To represent a belief about the continuous slope value $m^*$ for a Non-Bayesian node we discretize $m$ in the following manner.  Let $\Theta = \{\theta_0, \theta_1,...\theta_n\}, n < \infty$ be the discrete set of possible states of the world over which each Non-Bayesian node holds a distribution of belief. Each $\theta_k$ corresponds to the belief that the slope of $p^*(x)$ is equal to $m_k$ where
 \begin{equation}
 \label{eq:theta_meaning}
-\hat{m_k} = \frac{4k}{n - k} - 2
+\hat{m_k} = \frac{(m_{max} - m_{min})k}{n - 1} + m_{min}
 \end{equation}
-As an example, if we take n = 21 belief states, then we have
+As an example, if we take $n = 21$ belief states, $m_{min} = -2$, and $m_{max} = 2$, then we have
 \begin{equation}
 \nonumber
 \begin{cases}
@@ -91,11 +100,11 @@ m_{i,t}(s_i) = \int_\Theta \ell_i(s_i|\theta)d\mu_{i,t}(\theta) = \sum_{k=1}^n \
 \end{equation}
 
 % @todo[DDC] More detail for derivation/explanation of likelihood?
-In this case the likelihood function $\ell_i(s_i|\theta_k)$ can be obtained from the probability distribution function represented by the belief state $\theta_k$.
+The likelihood function $\ell_i(s_i|\theta_k)$ can be obtained from the probability distribution function represented by the belief state $\theta_k$.  As an example, for the trapezoidal distribution described in section~\ref{sec:trapezoidal_distribution}, the likelihood function would be
 
 \begin{equation}
 \label{eq:likelihood}
-\ell_i(s_i|\theta_k) = \hat{m_k} s_i + \frac{1}{2}(2 - \hat{m_k})
+\ell_i(s_i|\theta_k) \propto \hat{m_k} s_i + \frac{1}{2}(2 - \hat{m_k})
 \end{equation}
 where $\hat{m_k}$ is defined as in equation~\ref{eq:theta_meaning}.
 
@@ -115,7 +124,8 @@ Secondly, we must define $\mu_{j,t}(\theta_k)$ when $j$ is a DeGroot node.  We c
 \subsubsection{Belief Distribution from Draw of Probability Distribution}
 \label{sec:draw_from_degroot}
 
-We require a method for converting a DeGroot node $j$'s belief $m_{j,t} \in \mathbf{R}$ to a series of priors which can be included in a Non-Bayesian node $i$'s belief update.  The first method we consider involves generating a probability distribution from the $j$'s current belief and drawing from this distribution.  For each DeGroot neighbor of $i$ at time $t$ we define the probability distribution
+We require a method for converting a DeGroot node $j$'s belief $m_{j,t} \in \mathbb{R}$ to a series of priors which can be included in a Non-Bayesian node $i$'s belief update.  The first method we consider involves generating a probability distribution $p_{j,t}$ from $j$'s belief at time $t$ and drawing from this distribution.  The generated distribution is the $p_{j,t} \in \mathbb{P}$ where $j$'s belief $m_{j,t}$ is the single parameter defining the distribution.  If $\mathbb{P}$ is the trapezoidal distribution defined in section~\ref{sec:trapezoidal_distribution}, then for each DeGroot neighbor of $i$ at time $t$ we have
+
 \begin{equation}
 p_{j,t}(x)=\begin{cases}
 m_{j,t} x + \frac{1}{2}(2-m_{j,t}) & 0 \le x \le 1 \\
@@ -126,7 +136,7 @@ m_{j,t} x + \frac{1}{2}(2-m_{j,t}) & 0 \le x \le 1 \\
 This is simply the distribution which $j$ believes to be the state of the world.  We then draw a single signal $s_{j,t}^\prime$ from this distribution.  We create a belief distribution $\mu_{j,t}^\prime$ from $s_{j,t}^\prime$ by performing a Bayesian-style update with equal priors.
 
 \begin{equation}
-\mu_{j,t}^\prime(\theta_k) = \frac{\ell_i(s_{j,t}^\prime|\theta_k)}{\ell_i(s_{j,t}^\prime|\theta_0) + \ell_i(s_{j,t}^\prime|\theta_1) + ... + \ell_i(s_{j,t}^\prime|\theta_n)}
+\mu_{j,t}^\prime(\theta_k) = \frac{\ell_i(s_{j,t}^\prime|\theta_k)}{\sum_{i=1}^{n} \ell_i(s_{j,t}^\prime|\theta_i)}
 \end{equation}
 
 This generated belief distribution $\mu_{j,t}^\prime$ is then used for the values of $\mu_{j,t}(\theta_k)$ for the DeGroot node $j$ in the Non-Bayesian update of equation~\ref{eq:non_bayesian_update}.
