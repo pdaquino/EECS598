@@ -3,8 +3,8 @@ package eecs598;
 import java.util.HashMap;
 import java.util.List;
 
+import eecs598.factories.probability.DistributionFactory;
 import eecs598.probability.Distribution;
-import eecs598.probability.DistributionFactory;
 import eecs598.probability.ProbabilityUtil;
 
 /**

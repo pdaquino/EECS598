@@ -18,7 +18,7 @@ import eecs598.probability.ProbabilityUtil;
  * @author Pedro
  *
  */
-public class DeGrootNode implements Node {
+public class DeGrootNode extends Node {
 	
 	// TODO I am not considering the node's own estimate for the first time
 	// it receives a signal -- I am just copying the average of the neighbor's.
@@ -42,9 +42,9 @@ public class DeGrootNode implements Node {
 	 */
 	private List<Distribution> possibleDistributions;
 	
-	public DeGrootNode(ParameterEstimator parameterEstimator,
+	public DeGrootNode(int id, ParameterEstimator parameterEstimator,
 			BeliefEstimator beliefEstimator) {
-		super();
+		super(id);
 		this.parameterEstimator = parameterEstimator;
 		this.beliefEstimator = beliefEstimator;
 	}

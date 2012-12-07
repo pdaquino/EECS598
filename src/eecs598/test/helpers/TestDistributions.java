@@ -2,8 +2,8 @@ package eecs598.test.helpers;
 
 import java.util.Random;
 
+import eecs598.factories.probability.DistributionFactory;
 import eecs598.probability.Distribution;
-import eecs598.probability.DistributionFactory;
 import eecs598.util.NotImplementedException;
 
 public class TestDistributions {

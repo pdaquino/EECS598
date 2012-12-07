@@ -9,8 +9,8 @@ import java.util.List;
 import org.junit.Test;
 
 import eecs598.RandomDrawBeliefEstimator;
+import eecs598.factories.probability.DistributionFactory;
 import eecs598.probability.Distribution;
-import eecs598.probability.DistributionFactory;
 import eecs598.test.helpers.TestDistributions;
 
 public class RandomDrawBeliefEstimatorTest {

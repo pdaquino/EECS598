@@ -18,8 +18,8 @@ public class DeGrootNodeTest {
 
 	@Test
 	public void testOneNeighbor() {
-		ExpectedValueNode neighbor = new ExpectedValueNode(42.0);
-		DeGrootNode node = new DeGrootNode(new NopParameterEstimator(),
+		ExpectedValueNode neighbor = new ExpectedValueNode(1, 42.0);
+		DeGrootNode node = new DeGrootNode(2, new NopParameterEstimator(),
 				new RandomDrawBeliefEstimator(new TestDistributions.UniformFactory()));
 		
 		List<Node> nodeNeighbors = new ArrayList<Node>();
@@ -32,9 +32,9 @@ public class DeGrootNodeTest {
 	
 	@Test
 	public void testTwoNeighbors() {
-		ExpectedValueNode neighbor1 = new ExpectedValueNode(42.0);
-		ExpectedValueNode neighbor2 = new ExpectedValueNode(0);
-		DeGrootNode node = new DeGrootNode(new NopParameterEstimator(),
+		ExpectedValueNode neighbor1 = new ExpectedValueNode(1, 42.0);
+		ExpectedValueNode neighbor2 = new ExpectedValueNode(2, 0);
+		DeGrootNode node = new DeGrootNode(3, new NopParameterEstimator(),
 				new RandomDrawBeliefEstimator(new TestDistributions.UniformFactory()));
 		
 		List<Node> nodeNeighbors = new ArrayList<Node>();

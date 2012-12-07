@@ -9,7 +9,7 @@ import java.util.Map;
 import eecs598.probability.Distribution;
 import eecs598.probability.ProbabilityUtil;
 
-public class NonBayesianNode implements Node {
+public class NonBayesianNode extends Node {
 
 	/**
 	 * Associates each possible distribution to a belief between
@@ -21,11 +21,9 @@ public class NonBayesianNode implements Node {
 	 * An order list of possible distributions.
 	 */
 	private List<Distribution> distributions;
-	
-	private int id;
-	
+		
 	public NonBayesianNode(int id, List<Distribution> possibleDistributions) {
-		this.id = id;
+		super(id);
 		setPossibleDistributions(possibleDistributions);
 	}
 	
@@ -149,34 +147,8 @@ public class NonBayesianNode implements Node {
 		return new HashMap<>(beliefs);
 	}
 
-	public int getId() {
-		return id;
-	}
-
 	@Override
 	public String toString() {
-		return "NonBayesianNode " + id + " [" + beliefs + "]";
+		return "NonBayesianNode " + getId() + " [" + beliefs + "]";
 	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + id;
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		NonBayesianNode other = (NonBayesianNode) obj;
-		if (id != other.id)
-			return false;
-		return true;
-	}	
 }

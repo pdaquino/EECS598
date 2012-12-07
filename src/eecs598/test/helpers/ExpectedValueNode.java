@@ -13,9 +13,10 @@ import eecs598.probability.Distribution;
  * @author Pedro
  *
  */
-public class ExpectedValueNode implements Node {
+public class ExpectedValueNode extends Node {
 	private double expectedValue = 0;
-	public ExpectedValueNode(double expectedBeliefValue) {
+	public ExpectedValueNode(int id, double expectedBeliefValue) {
+		super(id);
 		this.expectedValue = expectedBeliefValue;
 	}
 	
