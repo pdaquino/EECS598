@@ -19,9 +19,9 @@ public class ProbabilityUtil {
 	 * Performs sum(probabilityMap[i].key * probabilityMap[i].value) for all valid i.
 	 * @return
 	 */
-	public static double expectedValue(HashMap<Double, Double> probabilityMap) {
+	public static double expectedValue(Map<Double, Double> neighborsBeliefs) {
 		double expectedValue = 0;
-		for(Map.Entry<Double, Double> valueProbPair : probabilityMap.entrySet()) {
+		for(Map.Entry<Double, Double> valueProbPair : neighborsBeliefs.entrySet()) {
 			double variableValue = valueProbPair.getKey();
 			double probability = valueProbPair.getValue();
 			if(probability >= 0 && probability <= 1) {

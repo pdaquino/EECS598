@@ -76,7 +76,8 @@ public class AverageBeliefTracker implements ExperimentAnalyzer {
 		StringBuilder logBlder = new StringBuilder();
 		logBlder.append(timestep).append("\t");
 		for(ParameterBeliefPair paramBelief : parameterBeliefs) {
-			logBlder.append(paramBelief.parameter).append("\t").append(paramBelief.belief).append("\t");
+			//logBlder.append(paramBelief.parameter).append("\t");
+			logBlder.append(paramBelief.belief).append("\t");
 		}
 		stream.println(logBlder.toString());
 	}

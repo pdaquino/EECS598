@@ -1,12 +1,13 @@
 package eecs598;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
 import eecs598.probability.Distribution;
 
-public abstract class Node {
+public abstract class Node implements Serializable {
 	
 	private int id;
 	

@@ -10,6 +10,11 @@ import eecs598.util.Util;
 
 public class ManyRandomDrawsBeliefEstimator extends RandomDrawBeliefEstimator {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
 	private final int numDraws = 50;
 	
 	public ManyRandomDrawsBeliefEstimator(

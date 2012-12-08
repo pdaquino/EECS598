@@ -45,9 +45,9 @@ public class Transformers {
 		@Override
 		public String transform(Node node) {
 			if(node instanceof NonBayesianNode) {
-				return String.format("%.2f", ProbabilityUtil.expectedValue(node.getBeliefs()));
+				return String.format("%d: %.2f", node.getId(), ProbabilityUtil.expectedValue(node.getBeliefs()));
 			} else {
-				return String.format("%.2f", ((DeGrootNode)node).getParameterEstimate());
+				return String.format("%d: %.2f", node.getId(), ((DeGrootNode)node).getParameterEstimate());
 			}
 		}
 	}

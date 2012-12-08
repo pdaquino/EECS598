@@ -1,5 +1,6 @@
 package eecs598;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
@@ -16,8 +17,12 @@ import eecs598.probability.ProbabilityUtil;
  * @author Pedro
  *
  */
-public class RandomDrawBeliefEstimator implements BeliefEstimator {
+public class RandomDrawBeliefEstimator implements BeliefEstimator, Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * This class creates parametrized distributions. We use it to construct
 	 * a customized distribution with our current estimate of the parameter.

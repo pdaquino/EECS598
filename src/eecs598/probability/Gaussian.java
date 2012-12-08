@@ -1,9 +1,11 @@
 package eecs598.probability;
 
+import java.io.Serializable;
+
 import cern.jet.random.Normal;
 import cern.jet.random.engine.RandomEngine;
 
-public class Gaussian implements Distribution {
+public class Gaussian implements Distribution, Serializable {
 
 	private Normal normal;
 	private double mean;

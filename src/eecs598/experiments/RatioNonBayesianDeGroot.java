@@ -1,5 +1,8 @@
 package eecs598.experiments;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,15 +55,17 @@ public class RatioNonBayesianDeGroot {
 		
 		Graph<Node, Edge> graph = erdosRenyiGenerator.create();
 		
-		controller.run(graph, 300);
+		controller.run(graph, 5000);
 		
 		ConvergenceInspector convergenceInspector = new ConvergenceInspector();
 		boolean converged = convergenceInspector.haveConverged(graph.getVertices());
-		System.out.println("\tConvergence: " + converged);
-		if(converged) {
-			System.out.println("\tParameter: " + convergenceInspector.getConvergedParameter(graph.getVertices()));
+//		System.out.println("\tConvergence: " + converged);
+//		if(converged) {
+//			System.out.println("\tParameter: " + convergenceInspector.getConvergedParameter(graph.getVertices()));
+//		}
+		if(!converged) {
+			System.out.println("Did not converge");
 		}
-		
 		return graph;
 	}
 	
@@ -111,20 +116,42 @@ public class RatioNonBayesianDeGroot {
 		RatioNonBayesianDeGroot onlyNb = new RatioNonBayesianDeGroot(ratio, possibleDistributions, new GaussianFactory());
 		
 		ExperimentController controller = new ExperimentController(trueDistribution);
-		controller.attachAnalyzer(new AverageBeliefTracker(System.out, NodeType.NonBayesian));
-		controller.attachAnalyzer(new AverageBeliefTracker(System.err, NodeType.DeGroot));
+		//controller.attachAnalyzer(new AverageBeliefTracker(System.out, NodeType.NonBayesian));
+		//controller.attachAnalyzer(new AverageBeliefTracker(System.err, NodeType.DeGroot));
 		//controller.attachAnalyzer(new ParameterEstimateTracker(System.err));
 		
-		return onlyNb.runErdosRenyi(controller, 80, 0.1);
+		return onlyNb.runErdosRenyi(controller, 20, 0.1);
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		double ratio = 0.8;
 		//runSanityCheck(ratio);
 		//run2GaussiansEasy(ratio);
 		//Graph graph = run2GaussiansHard(ratio);
-		Graph graph = runNGaussiansHard(20, ratio);
+		Graph<Node, Edge> graph = null;
+		for(int i = 0; i < 100; i++) {
+			graph = runNGaussiansHard(20, ratio);
+			ConvergenceInspector convergenceInspector = new ConvergenceInspector();
+			boolean converged = convergenceInspector.haveConverged(graph.getVertices());
+			if(!converged) {
+				NetworkVisualizer visualizer = new NetworkVisualizer();
+				visualizer.showGraph(graph);
+				
+				FileOutputStream underlyingStream = new FileOutputStream("no_convergence_" + i + ".jung");
+			    ObjectOutputStream serializer = new ObjectOutputStream(underlyingStream);
+			    serializer.writeObject(graph);
+			    serializer.close();
+			    underlyingStream.close();   
+			}
+		}
 		NetworkVisualizer visualizer = new NetworkVisualizer();
 		visualizer.showGraph(graph);
+		
+		FileOutputStream underlyingStream = new FileOutputStream("temp.jung");
+	    ObjectOutputStream serializer = new ObjectOutputStream(underlyingStream);
+	    serializer.writeObject(graph);
+	    serializer.close();
+	    underlyingStream.close();   
+
 	}
 }

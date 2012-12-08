@@ -1,5 +1,6 @@
 package eecs598;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -10,7 +11,12 @@ import eecs598.probability.Distribution;
 import eecs598.probability.ProbabilityUtil;
 import eecs598.util.Util;
 
-public class NonBayesianNode extends Node {
+public class NonBayesianNode extends Node implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * Associates each possible distribution to a belief between
@@ -29,7 +35,7 @@ public class NonBayesianNode extends Node {
 	}
 	
 	@Override
-	public void newSignal(Collection<Node> neighbors, double signal) {
+	public synchronized void newSignal(Collection<Node> neighbors, double signal) {
 		//
 		// Perform the bayesian update + the degroot-style averaging of neighbors.
 		//
@@ -141,7 +147,7 @@ public class NonBayesianNode extends Node {
 	}
 
 	@Override
-	public HashMap<Double, Double> getBeliefs() {
+	public synchronized HashMap<Double, Double> getBeliefs() {
 		/**
 		 * Returning a shallow copy should be fine -- I don't think we will update
 		 * the Doubles inside of the HashMap.

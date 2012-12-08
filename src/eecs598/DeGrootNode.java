@@ -1,8 +1,10 @@
 package eecs598;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import eecs598.probability.Distribution;
 import eecs598.probability.ProbabilityUtil;
@@ -19,7 +21,12 @@ import eecs598.util.Util;
  * @author Pedro
  *
  */
-public class DeGrootNode extends Node {
+public class DeGrootNode extends Node implements Serializable {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	// TODO I am not considering the node's own estimate for the first time
 	// it receives a signal -- I am just copying the average of the neighbor's.
@@ -61,6 +68,10 @@ public class DeGrootNode extends Node {
 
 	@Override
 	public void newSignal(Collection<Node> neighbors, double signal) {
+		if(getId() == 5) {
+			// XXX
+			int a = 42;
+		}
 		//
 		// Use the signal to update our estimate.
 		//
@@ -86,15 +97,12 @@ public class DeGrootNode extends Node {
 		}
 		
 		for(Node neighbor : neighbors) {
-			//if(neighbor instanceof NonBayesianNode) {
-			// XXX test code!
 			double weight = getNeighborInfluence(neighbor, neighbors);
-			double weightedEstimate = weight * ProbabilityUtil.expectedValue(neighbor.getBeliefs());
+			Map<Double,Double> neighborsBeliefs = neighbor.getBeliefs();
+			double expectedValue = ProbabilityUtil.expectedValue(neighborsBeliefs);
+			double weightedEstimate = weight * expectedValue;
 			sumEstimates += weightedEstimate;
 			sumWeights += weight;
-			
-				
-			//}
 		}
 		
 		if(sumWeights > 0) {
@@ -122,8 +130,13 @@ public class DeGrootNode extends Node {
 		if(neighbors.contains(this)) {
 			throw new IllegalStateException("Self-loop in node " + toString() + ". Self-loops are not allowed.");
 		}
-		int neighborCount = neighbors.size() + 1; // +1 accounts for self-edge
-		return 1.0/neighborCount;		
+		if(neighbor instanceof NonBayesianNode) {
+			return 2;
+		} else {
+			return 1;
+		}
+//		int neighborCount = neighbors.size();// + 1; // +1 accounts for self-edge
+//		return 1.0/neighborCount;		
 	}
 
 

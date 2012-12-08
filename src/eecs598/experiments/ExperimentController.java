@@ -8,6 +8,7 @@ import edu.uci.ics.jung.graph.Graph;
 import eecs598.Edge;
 import eecs598.Node;
 import eecs598.experiments.analyzer.ExperimentAnalyzer;
+import eecs598.experiments.visualization.NetworkVisualizer;
 import eecs598.probability.Distribution;
 
 /**
@@ -28,7 +29,7 @@ public class ExperimentController {
 	public void attachAnalyzer(ExperimentAnalyzer analyzer) {
 		this.analyzers.add(analyzer);
 	}
-	
+
 	public void run(Graph<Node, Edge> graph, int numTimesteps) {
 		notifyAllAnalyzers(0, graph);
 		for(int i = 0; i < numTimesteps; i++) {
