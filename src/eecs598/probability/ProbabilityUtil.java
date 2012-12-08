@@ -41,7 +41,11 @@ public class ProbabilityUtil {
 		double sum = sum(values);
 		List<Double> normalizedValues = new ArrayList<Double>(values.size());
 		for(Double value : values) {
-			normalizedValues.add(value / sum);
+			if(sum > 0) {
+				normalizedValues.add(value / sum);
+			} else {
+				normalizedValues.add(0.5);
+			}
 		}
 		return normalizedValues;
 	}
@@ -53,7 +57,11 @@ public class ProbabilityUtil {
 	public static void normalizeToOne(HashMap<? extends Object, Double> values) {
 		double sum = sum(values.values());
 		for(Map.Entry<? extends Object, Double> entry : values.entrySet()) {
-			entry.setValue(entry.getValue() / sum);
+			if(sum > 0) {
+				entry.setValue(entry.getValue() / sum);
+			} else {
+				entry.setValue(0.5);
+			}
 		}
 	}
 	

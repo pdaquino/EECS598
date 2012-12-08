@@ -8,6 +8,7 @@ import java.util.Map;
 
 import eecs598.probability.Distribution;
 import eecs598.probability.ProbabilityUtil;
+import eecs598.util.Util;
 
 public class NonBayesianNode extends Node {
 
@@ -92,6 +93,7 @@ public class NonBayesianNode extends Node {
 				double parameter = paramBeliefPair.getKey();
 				double belief = paramBeliefPair.getValue();
 				double weightedNeighborBelief = influence * belief;
+				Util.throwIfNaN(weightedNeighborBelief);
 				//
 				// Update our belief by adding the weighted neighbor's.
 				//

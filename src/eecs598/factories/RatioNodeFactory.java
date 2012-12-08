@@ -49,7 +49,7 @@ public class RatioNodeFactory implements Factory<Node> {
 		if(random.nextDouble() <= nonBayesianRatio) {
 			node = new NonBayesianNode(nodeCounter, possibleDistributions);
 		} else {
-			node = new DeGrootNode(nodeCounter, parameterEstimator, beliefEstimator);
+			node = new DeGrootNode(nodeCounter, parameterEstimator, beliefEstimator, possibleDistributions);
 		}
 		nodeCounter++;
 		return node;

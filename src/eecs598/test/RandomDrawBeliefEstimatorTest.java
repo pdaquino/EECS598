@@ -9,7 +9,9 @@ import java.util.List;
 import org.junit.Test;
 
 import eecs598.RandomDrawBeliefEstimator;
+import eecs598.experiments.DistributionRepository;
 import eecs598.factories.probability.DistributionFactory;
+import eecs598.factories.probability.GaussianFactory;
 import eecs598.probability.Distribution;
 import eecs598.test.helpers.TestDistributions;
 
@@ -42,9 +44,20 @@ public class RandomDrawBeliefEstimatorTest {
 		for(Double belief : beliefs.values()) {
 			assertEquals(expectedBelief, belief, 0.0001);
 		}
+	}
+	
+	@Test
+	public void testGaussian() {
+		//55.0506799730004
+		List<Distribution> possibleDistributions = new ArrayList<>();
+		DistributionRepository.getTwoGaussiansHard(possibleDistributions);
 		
+		RandomDrawBeliefEstimator estimator = new RandomDrawBeliefEstimator(new GaussianFactory());
+		HashMap<Double, Double> beliefs = estimator.estimateBeliefs(55.0506799730004, possibleDistributions);
 		
-		
+		for(Double belief : beliefs.values()) {
+			assertFalse(Double.isNaN(belief));
+		}
 	}
 
 }

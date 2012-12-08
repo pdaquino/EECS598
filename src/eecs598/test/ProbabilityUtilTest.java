@@ -47,5 +47,18 @@ public class ProbabilityUtilTest {
 			fail();
 		} catch(IllegalArgumentException e) {}
 	}
+	
+	@Test
+	public void normalizeToOneTest() {
+		HashMap<Double, Double> probMap = new HashMap<>();
+		probMap.put(1.0, 0.0);
+		probMap.put(2.0, 0.0);
+		
+		ProbabilityUtil.normalizeToOne(probMap);
+		
+		assertEquals(0.5, probMap.get(1.0), 0.000001);
+		assertEquals(0.5, probMap.get(2.0), 0.000001);
+		
+	}
 
 }

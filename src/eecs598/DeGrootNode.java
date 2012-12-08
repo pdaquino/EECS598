@@ -6,6 +6,7 @@ import java.util.List;
 
 import eecs598.probability.Distribution;
 import eecs598.probability.ProbabilityUtil;
+import eecs598.util.Util;
 
 /**
  * Represents a DeGroot node, which maintains an estimate of the parameter. The main
@@ -49,6 +50,15 @@ public class DeGrootNode extends Node {
 		this.beliefEstimator = beliefEstimator;
 	}
 
+	public DeGrootNode(int id, ParameterEstimator parameterEstimator,
+			BeliefEstimator beliefEstimator,
+			List<Distribution> possibleDistributions) {
+		super(id);
+		this.parameterEstimator = parameterEstimator;
+		this.beliefEstimator = beliefEstimator;
+		this.possibleDistributions = possibleDistributions;
+	}
+
 	@Override
 	public void newSignal(Collection<Node> neighbors, double signal) {
 		//
@@ -68,20 +78,32 @@ public class DeGrootNode extends Node {
 		//
 		
 		if(!firstSignal) {
-			sumEstimates += this.estimate;
-			sumWeights += getNeighborInfluence(this, neighbors); // self-influence
+//			double weight = getNeighborInfluence(this, neighbors); // self-influence
+//			sumEstimates += weight*this.estimate;
+//			sumWeights +=  weight; 
 		} else {
 			firstSignal = false;
 		}
 		
 		for(Node neighbor : neighbors) {
+			//if(neighbor instanceof NonBayesianNode) {
+			// XXX test code!
 			double weight = getNeighborInfluence(neighbor, neighbors);
 			double weightedEstimate = weight * ProbabilityUtil.expectedValue(neighbor.getBeliefs());
 			sumEstimates += weightedEstimate;
 			sumWeights += weight;
+			
+				
+			//}
 		}
 		
-		this.estimate = sumEstimates / sumWeights;
+		if(sumWeights > 0) {
+			this.estimate = sumEstimates / sumWeights;
+		} else {
+			this.estimate = 0;
+		}
+		
+		Util.throwIfNaN(this.estimate);
 	}
 	
 	/**
@@ -93,7 +115,7 @@ public class DeGrootNode extends Node {
 	 */
 	protected double getNeighborInfluence(Node neighbor, Collection<Node> neighbors) {
 		// TODO This is copy/paste from NonBayesianNode.. Code smell
-		
+
 		//
 		// We just have a uniform distribution.
 		//
@@ -107,6 +129,8 @@ public class DeGrootNode extends Node {
 
 	@Override
 	public HashMap<Double, Double> getBeliefs() {
+		// XXX test code
+		
 		return beliefEstimator.estimateBeliefs(estimate, possibleDistributions);
 	}
 

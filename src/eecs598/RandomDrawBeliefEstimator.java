@@ -22,7 +22,7 @@ public class RandomDrawBeliefEstimator implements BeliefEstimator {
 	 * This class creates parametrized distributions. We use it to construct
 	 * a customized distribution with our current estimate of the parameter.
 	 */
-	private DistributionFactory distributionFactory;
+	protected DistributionFactory distributionFactory;
 	
 	public RandomDrawBeliefEstimator(DistributionFactory distributionFactory) {
 		super();
@@ -47,6 +47,9 @@ public class RandomDrawBeliefEstimator implements BeliefEstimator {
 		double randomSample = estimatedDistribution.draw();
 		for(Distribution candidate : possibleDistributions) {
 			double pdf = candidate.pdf(randomSample);
+			if(Double.isNaN(pdf) || Double.isInfinite(pdf)) {
+				throw new IllegalStateException("Invalid probability");
+			}
 			beliefs.put(candidate.getParameter(), pdf);
 		}
 		

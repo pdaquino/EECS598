@@ -62,6 +62,28 @@ public class DistributionRepository {
 		}
 	}
 	
+	public static Distribution getNGaussiansEasy(int n, List<Distribution> possibleDistributions) {
+		throwIfNotEmpty(possibleDistributions);
+		double startingMean = 5.0;
+		double step = 10;
+		for(int i = 0; i < n; i++) {
+			possibleDistributions.add(new Gaussian(startingMean += i*step));
+		}
+		
+		return chooseRandom(possibleDistributions);
+	}
+	
+	public static Distribution getNGaussiansHard(int n, List<Distribution> possibleDistributions) {
+		throwIfNotEmpty(possibleDistributions);
+		double startingMean = 5.0;
+		double step = 1;
+		for(int i = 0; i < n; i++) {
+			possibleDistributions.add(new Gaussian(startingMean += i*step));
+		}
+		
+		return chooseRandom(possibleDistributions);
+	}
+	
 	private static Distribution chooseRandom(List<Distribution> list) {
 		Random rnd = new Random();
 		return list.get(rnd.nextInt(list.size()));
