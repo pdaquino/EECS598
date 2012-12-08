@@ -164,6 +164,54 @@ Thus the calculation to create the DeGroot node's level of belief in each state 
 \end{equation}
 
 
+\subsection{Convergence}
+In this section we discuss theoretical results concerning convergence.  Here we define convergence as consisting of two parts: convergence for Non-Bayesian nodes and convergence for DeGroot nodes.  For a Non-Bayesian node $b$, we consider $b$ to have converged to a belief state $\theta_{k}$ if $\mu_{b,t}(\theta_k) \to 1$ as $t \to \infty$.  We consider a DeGroot node $d$ to have converged to the belief value $m$ if $m_{d,t} \to m$ as $t \to \infty$.  If these conditions hold for every Non-Bayesian and DeGroot node in the network, we consider the network to have converged.
+
+We will demonstrate that convergence occurs for a very simple instance of our model, and then discuss difficulties encountered when attempting to extend these results.
+
+\subsubsection{Convergence in a Simple Case}
+Consider a network consisting of a Non-Bayesian node $b$ and a DeGroot node $d$ where $b$ and $d$ are connected and $d$ has a nonzero prior on the true state.  Suppose that $a_{dd}$ and $a_{bd}$ are strictly positive but that $a_{db} = 0$.  That is, the DeGroot node listens to the Non-Bayesian node but the Non-Bayesian does not consider the belief of the DeGroot node.
+
+The update calculation for the Non-Bayesian node will then be 
+\begin{equation}
+\mu_{b,t+1}(\theta_k) = a_{bb}\mu_{b,t}(\theta_k)\frac{\ell_i(\omega_{b,t+1}|\theta_k)}{m_{b,t}(\omega_{b,t+1})}
+\end{equation}
+
+This is simply a Bayesian update based on $b$'s signal received at every timestep, so follows that $b$'s belief will converge to the correct value.  That is, $\mu_{b,t}(\theta^*) \to 1$ as $t \to \infty$ where $\theta^*$ is the correct belief state.
+
+The DeGroot node $d$'s update calculation will be
+\begin{equation}
+m_{d,t+1} = a_{db}\sum_{i=1}^n\mu_{d,t}(\theta_i)\hat{m_k}
+\end{equation}
+
+Once $b$ has converged to the correct state this will reduce to 
+
+\begin{equation}
+m_{d,t+1} = a_{db}\hat{m_{\theta^*}} = m^*
+\end{equation}
+
+Thus we observe that the network consisting of a DeGroot node listening to a Non-Bayesian node will converge to the correct belief.
+
+\subsubsection{Difficulties in Extending Convergence Results}
+Consider the simple network described in the previous section with the modification that $a_{bd}$ is strictly positive, so that the Non-Bayesian node takes into account the belief of the DeGroot node.  We then have
+
+\begin{equation}
+\mu_{b,t+1} = a_{bb}\mu_{b,t}(\theta_w)\frac{\ell_i(\omega_{b,t+1}|\theta_k)}{m_{b,t}(\omega_{b,t+1})} + a_{bd}\mu_{d,t}^\prime(\theta_w)
+\end{equation}
+where the term $\mu_{d,t}^\prime(\theta_w)$ depends on the method used to convert DeGroot to Non-Bayesian belief.  The methods we consider in sections \ref{sec:draw_from_degroot} and \ref{sec:likelihood_metric} both inject a level of noise into the network during each belief update through this term.
+
+Noise from section~\ref{sec:draw_from_degroot}'s method results from the fact that we are performing a random draw from a probability distribution $p_{j,t}$ created from the parameter $m_{j,t}$ which may be different from the true value $m^*$.  Even if many draws are performs and averaged so that the ``signal-to-noise'' ratio is increased, the inclusion of data from a potentially incorrect probability distribution will still inject error into the network.
+
+The likelihood metric method discussed in section~\ref{sec:likelihood_metric} also introduces error.  Even if the DeGroot node $d$'s belief $m_{d,t}$ has converged to the correct value $m^*$, we still have
+\begin{equation}
+\mu_{d,t}^\prime(\theta_w) \propto e^{-(m_{d,t} - \hat{m_w})^2} > 0
+\end{equation}
+for each incorrect state $\{ \theta_w \in \Theta : \theta_w \neq \theta^* \}$.  This will result in a small amount of noise added to each update of $d$'s neighbors' beliefs.
+
+We have observed in simulation that the noise from the DeGroot to Non-Bayesian conversion can overcome the rate of learning from the signal observations and thus prevent convergence of the network.  However, it is difficult to determine exactly what conditions must hold for this to be the case.  The level of impact from the conversion noise will depend on many factors including network structure, trust values between nodes, and the number of states $\theta_i \in \Theta$ used to quantize possible values of $m^*$.  We have therefore found it difficult to prove convergence results with any significant level of generality.
+
+% Can discuss in conclusion that future work could either focus on figuring out how to do this or on developing other ways of doing the DeGroot-to-Non-Bayesian conversion that make such proofs easier.
+
 \bibliographystyle{plain}
 \bibliography{eecs598Report}
 
