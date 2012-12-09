@@ -20,7 +20,9 @@ We seek to investigate the behavior of a network consisting of nodes learning in
 
 \subsection{The Network}
 
-(Mixed Non-Bayesian and DeGroot nodes)
+The network in our model consists of an undirected graph where each vertex is either a Non-Bayesian or a DeGroot node.  At each discrete timestep $t$, every node will perform a belief update of its corresponding type.  If two vertices are connected by an edge, they are said to be neighbors and will incorporate each others' beliefs in their respective updates.
+
+The model allows for a variety of generative methods to be used for creation of the network structure such as Erdos-Renyi, Watts-Strogatz, Kleinberg's Small-World Model, or a power law distribution.  We investigate each of these network types in section \{ \}.% @todo[DDC] Refer to simulation results
 
 \subsection{States and Signals}
 
