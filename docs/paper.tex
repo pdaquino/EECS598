@@ -8,6 +8,10 @@
 
 \maketitle
 
+\begin{abstract}
+We consider a model of social learning in which the network consists of two distinct types of agents: nodes following the Non-Bayesian update rule developed by Jadbabaie et. al. are interspersed with non-observant nodes performing simple DeGroot-style belief updates.  We develop a model that allows these types of update rules to coexist, and we consider implications on belief convergence.  We present simulations of our model for a variety of network structures and ratios of Non-Bayesian to DeGroot nodes.
+\end{abstract}
+
 \section{Introduction and Background}
 
 Social learning is a process that occurs in a tremendous variety of settings; individuals and groups attempt to develop correct beliefs about complex issues such as economic patterns, social trends, and on new developments in technology.  Information may not always be easy to obtain in these situations.  Individuals receive a very limited picture of the true state of the world, and therefore must turn to neighbors in a social network to share opinions about these observations.  Thus we can think of the network as a whole attempting to learn the true state.
@@ -169,12 +173,12 @@ Thus the calculation to create the DeGroot node's level of belief in each state 
 \end{equation}
 
 
-\subsection{Convergence}
+\section{Convergence}
 In this section we discuss theoretical results concerning convergence.  Here we define convergence as consisting of two parts: convergence for Non-Bayesian nodes and convergence for DeGroot nodes.  For a Non-Bayesian node $b$, we consider $b$ to have converged to a belief state $\theta_{k}$ if $\mu_{b,t}(\theta_k) \to 1$ as $t \to \infty$.  We consider a DeGroot node $d$ to have converged to the belief value $m$ if $m_{d,t} \to m$ as $t \to \infty$.  If these conditions hold for every Non-Bayesian and DeGroot node in the network, we consider the network to have converged.
 
 We will demonstrate that convergence occurs for a very simple instance of our model, and then discuss difficulties encountered when attempting to extend these results.
 
-\subsubsection{Convergence in a Simple Case}
+\subsection{Convergence in a Simple Case}
 Consider a network consisting of a Non-Bayesian node $b$ and a DeGroot node $d$ where $b$ and $d$ are connected and $d$ has a nonzero prior on the true state.  Suppose that $a_{dd}$ and $a_{bd}$ are strictly positive but that $a_{db} = 0$.  That is, the DeGroot node listens to the Non-Bayesian node but the Non-Bayesian does not consider the belief of the DeGroot node.
 
 The update calculation for the Non-Bayesian node will then be 
@@ -197,7 +201,7 @@ m_{d,t+1} = a_{db}\hat{m_{\theta^*}} = m^*
 
 Thus we observe that the network consisting of a DeGroot node listening to a Non-Bayesian node will converge to the correct belief.
 
-\subsubsection{Difficulties in Extending Convergence Results}
+\subsection{Difficulties in Extending Convergence Results}
 Consider the simple network described in the previous section with the modification that $a_{bd}$ is strictly positive, so that the Non-Bayesian node takes into account the belief of the DeGroot node.  We then have
 
 \begin{equation}
@@ -214,6 +218,8 @@ The likelihood metric method discussed in section~\ref{sec:likelihood_metric} al
 for each incorrect state $\{ \theta_w \in \Theta : \theta_w \neq \theta^* \}$.  This will result in a small amount of noise added to each update of $d$'s neighbors' beliefs.
 
 We have observed in simulation that the noise from the DeGroot to Non-Bayesian conversion can overcome the rate of learning from the signal observations and thus prevent convergence of the network.  However, it is difficult to determine exactly what conditions must hold for this to be the case.  The level of impact from the conversion noise will depend on many factors including network structure, trust values between nodes, and the number of states $\theta_i \in \Theta$ used to quantize possible values of $m^*$.  We have therefore found it difficult to prove convergence results with any significant level of generality.
+
+\section{Conclusion}
 
 % Can discuss in conclusion that future work could either focus on figuring out how to do this or on developing other ways of doing the DeGroot-to-Non-Bayesian conversion that make such proofs easier.
 
