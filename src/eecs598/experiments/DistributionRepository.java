@@ -75,10 +75,10 @@ public class DistributionRepository {
 	
 	public static Distribution getNGaussiansHard(int n, List<Distribution> possibleDistributions) {
 		throwIfNotEmpty(possibleDistributions);
-		double startingMean = 5.0;
+		double startingMean = 100.0;
 		double step = 1;
 		for(int i = 0; i < n; i++) {
-			possibleDistributions.add(new Gaussian(startingMean += i*step));
+			possibleDistributions.add(new Gaussian(startingMean + i*step));
 		}
 		
 		return chooseRandom(possibleDistributions);

@@ -17,7 +17,7 @@ import eecs598.util.DoubleEquals;
  */
 public class ConvergenceInspector {
 	
-	private final double beliefConvergenceThreshold = 0.00001;
+	private final double beliefConvergenceThreshold = 0.0001;
 	
 	/**
 	 * We define convergence as:
