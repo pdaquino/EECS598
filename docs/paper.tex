@@ -8,10 +8,13 @@
 
 \maketitle
 
-\section{Introduction}
+\section{Introduction and Background}
 
-\cite{Jadbabaie2012}
-\cite{DeGroot1974}
+Social learning is a process that occurs in a tremendous variety of settings; individuals and groups attempt to develop correct beliefs about complex issues such as economic patterns, social trends, and on new developments in technology.  Information may not always be easy to obtain in these situations.  Individuals receive a very limited picture of the true state of the world, and therefore must turn to neighbors in a social network to share opinions about these observations.  Thus we can think of the network as a whole attempting to learn the true state.
+
+Many attempts have been made to model this phenomenon.  The DeGroot model of social influence proposes a system for reaching consensus where each node in a network adjusts their belief over time by linear combinations of their neighbors' beliefs~\cite{DeGroot1974}.  More sophisticated learning methods such as Bayesian inference provide algorithms for combining observations, neighboring opinions, and knowledge about network structure with prior beliefs to create a probability distribution over different belief states.  Jadbabaie et. al. propose a model for social learning that combines a Bayesian-style update with a simple linear inclusion of neighbors' opinions~\cite{Jadbabaie2012}.  They show that convergence to the correct belief about the state of the world is guaranteed under some straightforward assumptions about network connectivity and prior beliefs.
+
+We seek to investigate the behavior of a network consisting of nodes learning in the ``Non-Bayesian'' style of Jadbabaie et. al. with the added presence of DeGroot-style nodes.  These DeGroot nodes will make no observations about the state of the world and incorporate neighboring beliefs in a simple linear manner.  This can model social learning scenarios where some members of a network thoughtfully develop beliefs based on observations and advice, and others do nothing but naively pass along opinions.  What are the consequences of such naive agents in a social learning scenario?  Do certain network structures exacerbate their impact?  How many naive agents can be present before learning becomes prohibitively difficult?  In this work we investigate answers to these questions and propose our model of mixed Non-Bayesian and DeGroot learning as a tool for future research.
 
 \section{The Model}
 
@@ -21,16 +24,16 @@
 
 \subsection{States and Signals}
 
-We will consider the state of the world to be a probability distribution $p^*(t) \in \mathbb{P}$.  $\mathbb{P}$ is a pre-defined class of distributions where each  $p^*(t) \in \mathbb{P}$ is distinguishable by a single parameter.  This single parameter $m^*$ where $\{m^* \in \mathbb{R}: m_{min} <= m^* <= m_{max} \}$  will be the state which the nodes in the network are attempting to learn.  That is, $m^*$ is the ``true'' state of the world.  \emph{A priori}, the nodes know the class of distribution but not the specific value of $m^*$; only that it lies uniformly in the range $[m_{min}, m_{max}]$.
+We will consider the state of the world to be a probability distribution $p^*(t) \in \mathbb{P}$.  $\mathbb{P}$ is a pre-defined class of distributions where each  $p^*(t) \in \mathbb{P}$ is distinguishable by a single parameter.  This single parameter $m^*$ where $\{m^* \in \mathbb{R}: m_{min} <= m^* <= m_{max} \}$  will be the state that the nodes in the network are attempting to learn.  That is, $m^*$ is the ``true'' state of the world.  \emph{A priori}, the nodes know the class of distribution but not the specific value of $m^*$; only that it lies uniformly in the range $[m_{min}, m_{max}]$.
 
-Our model allows for $\mathbb{P}$ to be any class of probability distribution as long as it can be completely specified by a single parameter $m^*$.  Examples include the Poisson distribution with parameter $m^*$ and Gaussian distribution with mean $m^*$ and constant variance.  We also introduce a trapezoidal probability distribution in section~\ref{sec:trapezoidal_distribution} which serves as a valid choice for $\mathbb{P}$.
+Our model allows for $\mathbb{P}$ to be any class of probability distribution as long as it can be completely specified by a single parameter $m^*$.  Examples include the Poisson distribution with parameter $m^*$ and Gaussian distribution with mean $m^*$ and constant variance.  We also introduce a trapezoidal probability distribution in section~\ref{sec:trapezoidal_distribution} that serves as a valid choice for $\mathbb{P}$.
 
-At each timestep $t$, every Non-Bayesian node $i$ will receive a signal $s_{i,t}$ which is a value drawn from $p^*(x)$.  These observations will be used by the nodes in the network to construct a belief about $m^*$.
+At each timestep $t$, every Non-Bayesian node $i$ will receive a signal $s_{i,t}$ that is a value drawn from $p^*(x)$.  These observations will be used by the nodes in the network to construct a belief about $m^*$.
 
 \subsubsection{The Trapezoidal Distribution}
 \label{sec:trapezoidal_distribution}
 
-As an example of a class of distributions which can be used in our model we present the following trapezoidal distribution.
+As an example of a class of distributions that can be used in our model we present the following trapezoidal distribution.
 
 \begin{equation}
 p^*(x)=\begin{cases}
@@ -124,7 +127,7 @@ Secondly, we must define $\mu_{j,t}(\theta_k)$ when $j$ is a DeGroot node.  We c
 \subsubsection{Belief Distribution from Draw of Probability Distribution}
 \label{sec:draw_from_degroot}
 
-We require a method for converting a DeGroot node $j$'s belief $m_{j,t} \in \mathbb{R}$ to a series of priors which can be included in a Non-Bayesian node $i$'s belief update.  The first method we consider involves generating a probability distribution $p_{j,t}$ from $j$'s belief at time $t$ and drawing from this distribution.  The generated distribution is the $p_{j,t} \in \mathbb{P}$ where $j$'s belief $m_{j,t}$ is the single parameter defining the distribution.  If $\mathbb{P}$ is the trapezoidal distribution defined in section~\ref{sec:trapezoidal_distribution}, then for each DeGroot neighbor of $i$ at time $t$ we have
+We require a method for converting a DeGroot node $j$'s belief $m_{j,t} \in \mathbb{R}$ to a series of priors that can be included in a Non-Bayesian node $i$'s belief update.  The first method we consider involves generating a probability distribution $p_{j,t}$ from $j$'s belief at time $t$ and drawing from this distribution.  The generated distribution is the $p_{j,t} \in \mathbb{P}$ where $j$'s belief $m_{j,t}$ is the single parameter defining the distribution.  If $\mathbb{P}$ is the trapezoidal distribution defined in section~\ref{sec:trapezoidal_distribution}, then for each DeGroot neighbor of $i$ at time $t$ we have
 
 \begin{equation}
 p_{j,t}(x)=\begin{cases}
@@ -133,7 +136,7 @@ m_{j,t} x + \frac{1}{2}(2-m_{j,t}) & 0 \le x \le 1 \\
 \end{cases}
 \end{equation}
 
-This is simply the distribution which $j$ believes to be the state of the world.  We then draw a single signal $s_{j,t}^\prime$ from this distribution.  We create a belief distribution $\mu_{j,t}^\prime$ from $s_{j,t}^\prime$ by performing a Bayesian-style update with equal priors.
+This is simply the distribution that $j$ believes to be the state of the world.  We then draw a single signal $s_{j,t}^\prime$ from this distribution.  We create a belief distribution $\mu_{j,t}^\prime$ from $s_{j,t}^\prime$ by performing a Bayesian-style update with equal priors.
 
 \begin{equation}
 \mu_{j,t}^\prime(\theta_k) = \frac{\ell_i(s_{j,t}^\prime|\theta_k)}{\sum_{i=1}^{n} \ell_i(s_{j,t}^\prime|\theta_i)}
@@ -149,7 +152,7 @@ The second method we consider for creating a probability distribution over the s
 \begin{equation}
 \mu_{j,t}^\prime(\theta_k) \propto e^{-(m_{j,t}-\hat{m_k})^2}
 \end{equation}
-where $\mu_{j,t}^\prime$ is the belief distribution which is used for the DeGroot node $j$'s values of $\mu_{j,t}(\theta_k)$ in the Non-Bayesian update of equation~\ref{eq:non_bayesian_update}.
+where $\mu_{j,t}^\prime$ is the belief distribution that is used for the DeGroot node $j$'s values of $\mu_{j,t}(\theta_k)$ in the Non-Bayesian update of equation~\ref{eq:non_bayesian_update}.
 
 Since $\mu_{j,t}^\prime$ must be a probability distribution we must normalize the values for each state with the value
 
@@ -200,7 +203,7 @@ Consider the simple network described in the previous section with the modificat
 \end{equation}
 where the term $\mu_{d,t}^\prime(\theta_w)$ depends on the method used to convert DeGroot to Non-Bayesian belief.  The methods we consider in sections \ref{sec:draw_from_degroot} and \ref{sec:likelihood_metric} both inject a level of noise into the network during each belief update through this term.
 
-Noise from section~\ref{sec:draw_from_degroot}'s method results from the fact that we are performing a random draw from a probability distribution $p_{j,t}$ created from the parameter $m_{j,t}$ which may be different from the true value $m^*$.  Even if many draws are performs and averaged so that the ``signal-to-noise'' ratio is increased, the inclusion of data from a potentially incorrect probability distribution will still inject error into the network.
+Noise from section~\ref{sec:draw_from_degroot}'s method results from the fact that we are performing a random draw from a probability distribution $p_{j,t}$ created from the parameter $m_{j,t}$ that may be different from the true value $m^*$.  Even if many draws are performs and averaged so that the ``signal-to-noise'' ratio is increased, the inclusion of data from a potentially incorrect probability distribution will still inject error into the network.
 
 The likelihood metric method discussed in section~\ref{sec:likelihood_metric} also introduces error.  Even if the DeGroot node $d$'s belief $m_{d,t}$ has converged to the correct value $m^*$, we still have
 \begin{equation}
