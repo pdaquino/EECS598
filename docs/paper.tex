@@ -1,6 +1,8 @@
 \documentclass[a4paper,12pt]{article}
 \usepackage{amsmath} % For 'cases' curly brace
 \usepackage{amsfonts} % For bold number set font
+\usepackage{graphicx}
+\usepackage[font=bf]{caption}
 \begin{document}
 \title{Mixed Non-Bayesian and DeGroot Learning}
 \author{Pedro d'Aquino\\pdaquino@umich.edu \and Dan Clark\\ddclark@umich.edu}
@@ -48,9 +50,13 @@ m^* \cdot x + \frac{1}{2}(2-m^*) & 0 \le x \le 1 \\
 \end{cases}
 \end{equation}
 
-% @todo[DDC] Graph/figure of this would probably be good to have.
-
 The slope $\{ m^* \in \mathbb{R} : m_{min} = -2 \le m^* \le 2 = m_{max} \}$ will be the defining characteristic of the distribution.  We have chosen to bound $m^*$ between -2 and 2 and add the term $\frac{1}{2}(2-m^*)$ so that the support of $p^*(x)$  is always over $[0,1]$.
+
+\begin{figure}[h]
+\centering
+\includegraphics[scale=0.8]{trapezoidalDistribution.eps}
+\caption{Trapezoidal Probability Distribution}
+\end{figure}
 
 \subsection{Representing Belief States}
 
