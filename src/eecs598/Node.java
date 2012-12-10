@@ -46,6 +46,8 @@ public abstract class Node implements Serializable {
 		result = prime * result + id;
 		return result;
 	}
+	
+	public abstract void resetBeliefs();
 
 	@Override
 	public boolean equals(Object obj) {

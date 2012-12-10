@@ -28,6 +28,7 @@ public class NetworkVisualizer {
         BasicVisualizationServer<Node,Edge> vv = new BasicVisualizationServer<>(layout);
         vv.setPreferredSize(new Dimension(700,700)); //Sets the viewing area size
         vv.getRenderContext().setVertexLabelTransformer(new Transformers.VertexLabel());
+        vv.getRenderContext().setVertexFillPaintTransformer(new Transformers.VertexFillPaint());
         vv.getRenderContext().setVertexShapeTransformer(new Transformers.VertexShape());
         //Shape s = vv.getRenderContext().getVertexShapeTransformer().transform(graph.getVertices().iterator().next());
         

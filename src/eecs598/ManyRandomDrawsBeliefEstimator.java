@@ -32,25 +32,34 @@ public class ManyRandomDrawsBeliefEstimator extends RandomDrawBeliefEstimator {
 		// likelihood of this random sample having originated from that distribution,
 		// which is a value proportional to that distribution's pdf.
 		//
-		HashMap<Double, Double> beliefs = new HashMap<>(possibleDistributions.size());
-		
-		// TODO try sampling many times and averaging them out?
-		for(Distribution candidate : possibleDistributions) {
-			beliefs.put(candidate.getParameter(), 1.0);
-		}
-		
-		Distribution estimatedDistribution = distributionFactory.create(parameterEstimate);
-		for (int i = 0; i < numDraws; i++) {
-			double randomSample = estimatedDistribution.draw();
+		HashMap<Double, Double> beliefs = new HashMap<>(
+				possibleDistributions.size());
+		if(parameterEstimate != -1) {
+			// TODO try sampling many times and averaging them out?
 			for (Distribution candidate : possibleDistributions) {
-				double pdf = candidate.pdf(randomSample);
-				Util.throwIfNaN(pdf);
-				double currentPdf = beliefs.get(candidate.getParameter());
-				beliefs.put(candidate.getParameter(), currentPdf * pdf);
+				beliefs.put(candidate.getParameter(), 1.0);
+			}
+
+			Distribution estimatedDistribution = distributionFactory
+					.create(parameterEstimate);
+			for (int i = 0; i < numDraws; i++) {
+				double randomSample = estimatedDistribution.draw();
+				for (Distribution candidate : possibleDistributions) {
+					double pdf = candidate.pdf(randomSample);
+					Util.throwIfNaN(pdf);
+					double currentPdf = beliefs.get(candidate.getParameter());
+					pdf = Math.min(0.001, pdf);
+					beliefs.put(candidate.getParameter(), currentPdf * pdf);
+				}
+			}
+			ProbabilityUtil.normalizeToOne(beliefs);
+		} else {
+			// uniform
+			for (Distribution candidate : possibleDistributions) {
+				beliefs.put(candidate.getParameter(), 1.0);
 			}
 			ProbabilityUtil.normalizeToOne(beliefs);
 		}
-				
 		return beliefs;
 	}
 

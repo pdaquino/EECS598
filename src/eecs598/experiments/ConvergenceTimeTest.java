@@ -13,9 +13,11 @@ import org.apache.commons.collections15.Factory;
 import edu.uci.ics.jung.algorithms.generators.GraphGenerator;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.UndirectedGraph;
+import eecs598.DistanceBeliefEstimator;
 import eecs598.Edge;
 import eecs598.ManyRandomDrawsBeliefEstimator;
 import eecs598.Node;
+import eecs598.NonBayesianNode;
 import eecs598.NopParameterEstimator;
 import eecs598.experiments.visualization.NetworkVisualizer;
 import eecs598.factories.EdgeFactory;
@@ -69,6 +71,9 @@ public class ConvergenceTimeTest {
 	 * @throws IOException
 	 */
 	public MeanAndStdDev run(int nRuns, Factory<ExperimentalSetup> setupFactory) throws IOException {
+		
+		NonBayesianNode.listensToSignalRatio = 0.4;
+		
 		List<Double> convergenceTimes = new ArrayList<Double>();
 		ExperimentalSetup setup = setupFactory.create();
 		Experiment experiment = new Experiment(setup);
@@ -79,7 +84,8 @@ public class ConvergenceTimeTest {
 				ratioNonBayesian,
 				setup.getPossibleDistributions(),
 				new NopParameterEstimator(),
-				new ManyRandomDrawsBeliefEstimator(setup.getDistributionFactory()));
+				//new ManyRandomDrawsBeliefEstimator(setup.getDistributionFactory()));
+				new DistanceBeliefEstimator());
 		
 		Factory<Edge> edgeFactory = new EdgeFactory();
 		
@@ -93,14 +99,17 @@ public class ConvergenceTimeTest {
 			connector.makeConnected(graph, edgeFactory);
 			if(!connector.isConnected(graph)) throw new RuntimeException("Graph is not connected!");
 			try {				
-				int timesteps = experiment.runUntilConvergence(
-						generatorFactory, nodeFactory, edgeFactory, graphFactory);
+				int timesteps = experiment.runUntilConvergence(graph);
 				//System.out.println(timesteps);
 				convergenceTimes.add((double)timesteps);
-				if(graph.getVertexCount() == 375) {
-					throw new MaxTimestepsExceededException();
-				}
 			} catch(MaxTimestepsExceededException e) {
+				//experiment.run(graph, 1);
+				try {
+					experiment.runUntilConvergence(graph);
+				} catch (MaxTimestepsExceededException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				String filename =  "no_convergence_" + new Date().getTime() + ".jung";
 				saveGraph(graph, filename); 
 				System.out.println("\tNo convergence: saved to " + filename);
@@ -121,9 +130,9 @@ public class ConvergenceTimeTest {
 	}
 	
 	public static void main(String[] args) throws IOException {
-		String arg = args[0];
-		//String arg = "barabasi"; 
-		if(arg.equals("kleinberg")) {
+		//String arg = args[0];
+		String arg = "complete"; 
+		if(arg.equals("barabasi")) {
 			runKleinberg();
 		} else if(arg.equals("barabasi")) {
 			runBarabasiAlbert();
@@ -184,7 +193,7 @@ public class ConvergenceTimeTest {
 			ConvergenceTimeTest test = new ConvergenceTimeTest();
 			test.setGeneratorFactory(new GeneratorFactories.EppsteinFactory(nodeCount, edgeToNodeRatio * nodeCount, generationTimesteps));
 			test.setConvergenceTestGranularity(Math.max(1, (nodeCount) / 100 / 2));
-			test.setMaxTimesteps(2000);
+			test.setMaxTimesteps(8000);
 			MeanAndStdDev convergenceTime = test.run(200, ExperimentalSetup.nGaussiansMediumFactory(2));
 			System.out.println(nodeCount + "\t" + convergenceTime.getMean() + "\t" + convergenceTime.getStdDev());
 		}

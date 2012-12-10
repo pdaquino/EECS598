@@ -19,7 +19,12 @@ public class Transformers {
 		@Override
 		public Paint transform(Node node) {
 			if(node instanceof NonBayesianNode) {
-				return Color.GREEN;
+				if(((NonBayesianNode)node).getListensToSignal()) {
+					return Color.GREEN;
+				} else {
+					return Color.GRAY;
+				}
+				//return Color.GREEN;
 			} else {
 				return Color.GRAY;
 			}

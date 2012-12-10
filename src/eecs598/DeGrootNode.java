@@ -31,7 +31,7 @@ public class DeGrootNode extends Node implements Serializable {
 	// TODO I am not considering the node's own estimate for the first time
 	// it receives a signal -- I am just copying the average of the neighbor's.
 	// Does it make sense? 
-	private double estimate = 0.0;
+	private double estimate = -1;
 	private boolean firstSignal = true;
 	
 	/**
@@ -158,6 +158,12 @@ public class DeGrootNode extends Node implements Serializable {
 	@Override
 	public void setPossibleDistributions(List<Distribution> distributions) {
 		this.setPossibleDistributions(distributions);
+	}
+
+	@Override
+	public void resetBeliefs() {
+		this.estimate = -1.0;
+		
 	}
 
 }

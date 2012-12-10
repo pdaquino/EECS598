@@ -14,11 +14,13 @@ import edu.uci.ics.jung.graph.UndirectedGraph;
 import eecs598.Edge;
 import eecs598.ManyRandomDrawsBeliefEstimator;
 import eecs598.Node;
+import eecs598.NonBayesianNode;
 import eecs598.NopParameterEstimator;
 import eecs598.experiments.visualization.NetworkVisualizer;
 import eecs598.factories.EdgeFactory;
 import eecs598.factories.GraphFactory;
 import eecs598.factories.RatioNodeFactory;
+import eecs598.test.helpers.TestGraphs.NonBayesianFactory;
 
 public class ConvergenceStressTest {
 	
