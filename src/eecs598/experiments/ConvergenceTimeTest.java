@@ -86,9 +86,12 @@ public class ConvergenceTimeTest {
 		Factory<UndirectedGraph<Node, Edge>> graphFactory = new GraphFactory();
 		
 		GraphGenerator<Node, Edge> generator = generatorFactory.create(nodeFactory, edgeFactory, graphFactory);
+		GraphConnector connector = new GraphConnector();
 		
 		for(int i = 0; i < nRuns; i++) {
 			Graph<Node, Edge> graph = generator.create();
+			connector.makeConnected(graph, edgeFactory);
+			if(!connector.isConnected(graph)) throw new RuntimeException("Graph is not connected!");
 			try {				
 				int timesteps = experiment.runUntilConvergence(
 						generatorFactory, nodeFactory, edgeFactory, graphFactory);
@@ -119,7 +122,7 @@ public class ConvergenceTimeTest {
 	
 	public static void main(String[] args) throws IOException {
 		String arg = args[0];
-		//String arg = "complete"; 
+		//String arg = "barabasi"; 
 		if(arg.equals("kleinberg")) {
 			runKleinberg();
 		} else if(arg.equals("barabasi")) {
