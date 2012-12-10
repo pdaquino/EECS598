@@ -6,12 +6,21 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import eecs598.probability.Distribution;
 import eecs598.probability.ProbabilityUtil;
 import eecs598.util.Util;
 
 public class NonBayesianNode extends Node implements Serializable {
+
+
+    // @todo[DDC] Should be taken as arguments
+    // Ratio of all nodes that pay attention to their received signal
+    private static final double listensToSignalRatio = 1.0;
+
+    // Does this particular node pay attention to its received signal
+    private boolean listensToSignal;
 
 	/**
 	 * 
@@ -31,6 +40,8 @@ public class NonBayesianNode extends Node implements Serializable {
 		
 	public NonBayesianNode(int id, List<Distribution> possibleDistributions) {
 		super(id);
+                Random random = new Random();
+                this.listensToSignal = (random.nextDouble() < NonBayesianNode.listensToSignalRatio);
 		setPossibleDistributions(possibleDistributions);
 	}
 	
@@ -39,7 +50,7 @@ public class NonBayesianNode extends Node implements Serializable {
 		//
 		// Perform the bayesian update + the degroot-style averaging of neighbors.
 		//
-		doBayesianUpdate(neighbors, signal);
+                if(this.listensToSignal) { doBayesianUpdate(neighbors, signal); }
 		ProbabilityUtil.normalizeToOne(beliefs);
 		doNonBayesianUpdate(neighbors, signal);
 		ProbabilityUtil.normalizeToOne(beliefs);
