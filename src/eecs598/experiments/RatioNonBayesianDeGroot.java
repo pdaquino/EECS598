@@ -13,6 +13,7 @@ import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.UndirectedGraph;
 import eecs598.Edge;
 import eecs598.ManyRandomDrawsBeliefEstimator;
+import eecs598.DistanceBeliefEstimator;
 import eecs598.Node;
 import eecs598.NopParameterEstimator;
 import eecs598.RandomDrawBeliefEstimator;
@@ -46,16 +47,19 @@ public class RatioNonBayesianDeGroot {
 		this.possibleDistributions = possibleDistributions;
 		this.nodeFactory = new RatioNodeFactory(
 				ratioNonBayesian, possibleDistributions,
-				new NopParameterEstimator(), new ManyRandomDrawsBeliefEstimator(distributionFactory));
+				new NopParameterEstimator(), new DistanceBeliefEstimator()/*new ManyRandomDrawsBeliefEstimator(distributionFactory)*/);
 		this.edgeFactory = new EdgeFactory();
 		this.graphFactory = new GraphFactory();
 	}
 
-	public Graph<Node, Edge> runErdosRenyi(ExperimentController controller, int numVertices, double p) {
+	public Graph<Node, Edge> runExperiment(ExperimentController controller, int numVertices, double p) {
 		ErdosRenyiGenerator<Node, Edge> erdosRenyiGenerator = new ErdosRenyiGenerator<Node, Edge>(
 				graphFactory, nodeFactory, edgeFactory, numVertices, p);
 		
-		Graph<Node, Edge> graph = erdosRenyiGenerator.create();
+                //		Graph<Node, Edge> graph = erdosRenyiGenerator.create();
+                Graph<Node, Edge> graph = new GeneratorFactories.ErdosRenyiFactory(15, 1.0).create(nodeFactory, edgeFactory, graphFactory).create();
+                GraphConnector connector = new GraphConnector();
+                connector.makeConnected(graph, edgeFactory);
 		
                 final int numTimesteps = 2000;
 		//controller.run(graph, numTimesteps);
@@ -80,7 +84,7 @@ public class RatioNonBayesianDeGroot {
 		Distribution trueDistribution = DistributionRepository.getZeroAndUniform(uniformId, possibleDistributions);
 		RatioNonBayesianDeGroot onlyNb = new RatioNonBayesianDeGroot(ratio, possibleDistributions, new GaussianFactory());
 		
-		return onlyNb.runErdosRenyi(new ExperimentController(trueDistribution), 10, 0.2);
+		return onlyNb.runExperiment(new ExperimentController(trueDistribution), 10, 0.2);
 	}
 	
 	public static Graph<Node, Edge> run2GaussiansEasy(double ratio) {
@@ -94,7 +98,7 @@ public class RatioNonBayesianDeGroot {
 		//controller.attachAnalyzer(new AverageBeliefTracker(System.out));
 		controller.attachAnalyzer(new AverageParameterEstimateTracker(System.out));
 		
-		return onlyNb.runErdosRenyi(controller, 10, 0.2);
+		return onlyNb.runExperiment(controller, 10, 0.2);
 	}
 	
 	public static Graph<Node, Edge> run2GaussiansHard(double ratio) {
@@ -109,7 +113,7 @@ public class RatioNonBayesianDeGroot {
 		controller.attachAnalyzer(new AverageBeliefTracker(System.err, NodeType.DeGroot));
 		//controller.attachAnalyzer(new ParameterEstimateTracker(System.err));
 		
-		return onlyNb.runErdosRenyi(controller, 20, 0.1);
+		return onlyNb.runExperiment(controller, 20, 0.1);
 	}
 	
 	public static Graph<Node, Edge> runNGaussiansHard(int n, double ratio) {
@@ -126,7 +130,7 @@ public class RatioNonBayesianDeGroot {
                 //controller.attachAnalyzer(new AverageParameterEstimateTracker(System.err));
 		
                 int numNodes = 30;
-		return mixedNodes.runErdosRenyi(controller, numNodes, 0.1);
+		return mixedNodes.runExperiment(controller, numNodes, 0.1);
 	}
 	
 	public static void main(String[] args) throws IOException {
