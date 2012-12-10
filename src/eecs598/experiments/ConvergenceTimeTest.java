@@ -94,11 +94,15 @@ public class ConvergenceTimeTest {
 						generatorFactory, nodeFactory, edgeFactory, graphFactory);
 				//System.out.println(timesteps);
 				convergenceTimes.add((double)timesteps);
+				if(graph.getVertexCount() == 375) {
+					throw new MaxTimestepsExceededException();
+				}
 			} catch(MaxTimestepsExceededException e) {
 				String filename =  "no_convergence_" + new Date().getTime() + ".jung";
 				saveGraph(graph, filename); 
 				System.out.println("\tNo convergence: saved to " + filename);
 				System.out.println("\tTrue mean: " + setup.getTrueDistribution().getParameter());
+				if(graph.getVertexCount() == 375)  break;
 			}
 		}
 		return MeanAndStdDev.fromSample(convergenceTimes);
@@ -114,16 +118,93 @@ public class ConvergenceTimeTest {
 	}
 	
 	public static void main(String[] args) throws IOException {
+		String arg = args[0];
+		//String arg = "complete"; 
+		if(arg.equals("kleinberg")) {
+			runKleinberg();
+		} else if(arg.equals("barabasi")) {
+			runBarabasiAlbert();
+		} else if(arg.equals("eppstein")) {
+			runEppstein();
+		} else if(arg.equals("complete")) {
+			runComplete();
+		}
+	}
+	
+	public static void runKleinberg() throws IOException {
 		int minLatticeSize = 2;
-		int maxLatticeSize = 20;
+		int maxLatticeSize = 30;
+		System.out.format("Kleinberg Small World\n");
 		System.out.println("Size\tMean\tStdDev");
 		for(int latticeSize = minLatticeSize; latticeSize < maxLatticeSize; latticeSize++) {
 			ConvergenceTimeTest test = new ConvergenceTimeTest();
 			test.setGeneratorFactory(new GeneratorFactories.KleinbergGenerator(latticeSize, 2));
 			test.setConvergenceTestGranularity(Math.max(1, latticeSize * latticeSize / 100 / 2));
-			test.setMaxTimesteps(1000);
-			MeanAndStdDev convergenceTime = test.run(60, ExperimentalSetup.nGaussiansHardFactory(2));
+			test.setMaxTimesteps(2000);
+			MeanAndStdDev convergenceTime = test.run(200, ExperimentalSetup.nGaussiansMediumFactory(2));
 			System.out.println(latticeSize*latticeSize + "\t" + convergenceTime.getMean() + "\t" + convergenceTime.getStdDev());
+		}
+	}
+	
+	public static void runBarabasiAlbert() throws IOException {
+		int initialNodeCount = 10;
+		int edgesPerTimestep = 5;
+		int minNumTimesteps = 5; // min total size is 15
+		int maxNumTimesteps = 490; // max total size is 500
+
+		System.out.format("Barbasi-Albert Preferential Attachment (initial node count = %d, edges per timestep = %d,"+
+		"minNumTimesteps = %d, maxNumTimesteps = %d\n", initialNodeCount, edgesPerTimestep, minNumTimesteps, maxNumTimesteps);
+		
+		System.out.println("Size\tMean\tStdDev");
+		for(int numTimesteps = minNumTimesteps; numTimesteps < maxNumTimesteps; numTimesteps+=20) {
+			int totalNodeCount = initialNodeCount + numTimesteps;
+			ConvergenceTimeTest test = new ConvergenceTimeTest();
+			test.setGeneratorFactory(new GeneratorFactories.BarabasiAlbertFactory(initialNodeCount, edgesPerTimestep, numTimesteps));
+			test.setConvergenceTestGranularity(Math.max(1, (totalNodeCount) / 100 / 2));
+			test.setMaxTimesteps(2000);
+			MeanAndStdDev convergenceTime = test.run(200, ExperimentalSetup.nGaussiansMediumFactory(2));
+			System.out.println(totalNodeCount + "\t" + convergenceTime.getMean() + "\t" + convergenceTime.getStdDev());
+		}
+	}
+	
+	public static void runEppstein() throws IOException {
+		int generationTimesteps = 50;
+		int edgeToNodeRatio = 3;
+		int minNodeCount = 15; // min total size is 15
+		int maxNodeCount = 500; // max total size is 500
+
+		System.out.format("Eppstein Power Law Attachment (minNodeCount = %d, maxNodeCount = %d,"+
+		"edgeToNodeRatio = %d, generationTimesteps = %d\n", minNodeCount, maxNodeCount, edgeToNodeRatio, generationTimesteps);
+		
+		System.out.println("Size\tMean\tStdDev");
+		for(int nodeCount = minNodeCount; nodeCount < maxNodeCount; nodeCount+=20) {
+			ConvergenceTimeTest test = new ConvergenceTimeTest();
+			test.setGeneratorFactory(new GeneratorFactories.EppsteinFactory(nodeCount, edgeToNodeRatio * nodeCount, generationTimesteps));
+			test.setConvergenceTestGranularity(Math.max(1, (nodeCount) / 100 / 2));
+			test.setMaxTimesteps(2000);
+			MeanAndStdDev convergenceTime = test.run(200, ExperimentalSetup.nGaussiansMediumFactory(2));
+			System.out.println(nodeCount + "\t" + convergenceTime.getMean() + "\t" + convergenceTime.getStdDev());
+		}
+	}
+	
+	/**
+	 * Compelte graph is an Erdos-Renyi with p=1.
+	 * @throws IOException
+	 */
+	public static void runComplete() throws IOException {
+		int minNodeCount = 15; // min total size is 15
+		int maxNodeCount = 500; // max total size is 500
+
+		System.out.format("Complete Graph (minNodeCount = %d, maxNodeCount = %d\n", minNodeCount, maxNodeCount);
+		
+		System.out.println("Size\tMean\tStdDev");
+		for(int nodeCount = minNodeCount; nodeCount < maxNodeCount; nodeCount+=20) {
+			ConvergenceTimeTest test = new ConvergenceTimeTest();
+			test.setGeneratorFactory(new GeneratorFactories.ErdosRenyiFactory(nodeCount, 1.0));
+			test.setConvergenceTestGranularity(Math.max(1, (nodeCount) / 100 / 2));
+			test.setMaxTimesteps(2000);
+			MeanAndStdDev convergenceTime = test.run(200, ExperimentalSetup.nGaussiansMediumFactory(2));
+			System.out.println(nodeCount + "\t" + convergenceTime.getMean() + "\t" + convergenceTime.getStdDev());
 		}
 	}
 }

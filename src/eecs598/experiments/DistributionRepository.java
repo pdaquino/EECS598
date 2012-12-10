@@ -88,4 +88,16 @@ public class DistributionRepository {
 		Random rnd = new Random();
 		return list.get(rnd.nextInt(list.size()));
 	}
+
+	public static Distribution getNGaussiansMedium(int nGaussians,
+			List<Distribution> possibleDistributions) {
+		throwIfNotEmpty(possibleDistributions);
+		double startingMean = 100.0;
+		double step = 5;
+		for(int i = 0; i < nGaussians; i++) {
+			possibleDistributions.add(new Gaussian(startingMean + i*step));
+		}
+		
+		return chooseRandom(possibleDistributions);
+	}
 }

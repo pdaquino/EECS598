@@ -86,7 +86,8 @@ public class NonBayesianNode extends Node implements Serializable {
 		for(Node neighbor : neighbors) {
 			
 			if(neighbor.equals(this)) {
-				throw new IllegalStateException("Self-loop in node " + toString() + ". Self-loops are not allowed.");
+				//throw new IllegalStateException("Self-loop in node " + toString() + ". Self-loops are not allowed.");
+				continue;
 			}
 				
 			HashMap<Double, Double> neighborsBeliefs = neighbor.getBeliefs();
@@ -125,9 +126,12 @@ public class NonBayesianNode extends Node implements Serializable {
 		// We just have a uniform distribution.
 		//
 		if(neighbors.contains(this)) {
-			throw new IllegalStateException("Self-loop in node " + toString() + ". Self-loops are not allowed.");
+			//throw new IllegalStateException("Self-loop in node " + toString() + ". Self-loops are not allowed.");
 		}
-		int neighborCount = neighbors.size() + 1; // +1 accounts for self-edge
+		int neighborCount = neighbors.size(); // +1 accounts for self-edge
+		if(!neighbors.contains(this)) {
+			neighborCount++;
+		}
 		return 1.0/neighborCount;		
 	}
 

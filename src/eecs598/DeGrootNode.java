@@ -128,7 +128,11 @@ public class DeGrootNode extends Node implements Serializable {
 		// We just have a uniform distribution.
 		//
 		if(neighbors.contains(this)) {
-			throw new IllegalStateException("Self-loop in node " + toString() + ". Self-loops are not allowed.");
+			//throw new IllegalStateException("Self-loop in node " + toString() + ". Self-loops are not allowed.");
+			//return 0;
+		}
+		if(neighbor == this) {
+			return 0;
 		}
 		if(neighbor instanceof NonBayesianNode) {
 			return 2;

@@ -1,16 +1,23 @@
 package eecs598.samples;
 
 import java.awt.Dimension;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.JFrame;
 
 import org.apache.commons.collections15.Factory;
 
+import edu.uci.ics.jung.algorithms.generators.random.BarabasiAlbertGenerator;
+import edu.uci.ics.jung.algorithms.generators.random.EppsteinPowerLawGenerator;
+import edu.uci.ics.jung.algorithms.generators.random.ErdosRenyiGenerator;
 import edu.uci.ics.jung.algorithms.generators.random.KleinbergSmallWorldGenerator;
 import edu.uci.ics.jung.algorithms.layout.CircleLayout;
 import edu.uci.ics.jung.algorithms.layout.Layout;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.SparseGraph;
+import edu.uci.ics.jung.graph.UndirectedGraph;
+import edu.uci.ics.jung.graph.UndirectedSparseGraph;
 import edu.uci.ics.jung.visualization.BasicVisualizationServer;
 
 /**
@@ -25,6 +32,13 @@ public class KleinbergTest {
 			@Override
 			public Graph<Integer, String> create() {
 				SparseGraph<Integer, String> g = new SparseGraph<>();
+				return g;
+			}
+		};
+		Factory<UndirectedGraph<Integer, String>> otherGraphFactory = new Factory<UndirectedGraph<Integer,String>>() {
+			@Override
+			public UndirectedGraph<Integer, String> create() {
+				UndirectedSparseGraph<Integer, String> g = new UndirectedSparseGraph<>();
 				return g;
 			}
 		};
@@ -44,10 +58,17 @@ public class KleinbergTest {
 			
 		};
 		
-		KleinbergSmallWorldGenerator<Integer, String> kleinbergGenerator = new KleinbergSmallWorldGenerator<>(
-				graphFactory, vertexFactory, edgeFactory, 10, 5);
+//		KleinbergSmallWorldGenerator<Integer, String> kleinbergGenerator = new KleinbergSmallWorldGenerator<>(
+//				graphFactory, vertexFactory, edgeFactory, 10, 5);
+//		
+//		this.g = kleinbergGenerator.create();
+		Set<Integer> seeds = new HashSet<Integer>();
+		int num_seeds = 10;
+		EppsteinPowerLawGenerator<Integer, String> gen = new EppsteinPowerLawGenerator<Integer, String>(
+				graphFactory, vertexFactory, edgeFactory, 15, 45, 50);
+		this.g = gen.create();
+		System.out.println(g.getVertexCount());
 		
-		this.g = kleinbergGenerator.create();
 	}
 	
 	public static void main(String[] args) {

@@ -48,6 +48,16 @@ public class ExperimentalSetup {
 			}
 			
 		};
-		
+	}
+	public static Factory<ExperimentalSetup> nGaussiansMediumFactory(final int nGaussians) {
+		return new Factory<ExperimentalSetup>() {
+			@Override
+			public ExperimentalSetup create() {
+				List<Distribution> possibleDistributions = new ArrayList<Distribution>();
+				Distribution trueDistribution = DistributionRepository.getNGaussiansMedium(nGaussians, possibleDistributions);
+				ExperimentalSetup setup = new ExperimentalSetup(possibleDistributions, trueDistribution, new GaussianFactory());
+				return setup;
+			}
+		};
 	}
 }
