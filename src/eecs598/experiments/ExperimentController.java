@@ -41,6 +41,26 @@ public class ExperimentController {
 		}
 	}
 	
+        /**
+         * Run the experiment, but stop early if experiment convergence.  Returns number
+         * of steps taken to converge, or -1 if convergence was not reached.
+         */
+        public int runUntilConvergence(Graph<Node, Edge> graph, int maxTimesteps) {
+            notifyAllAnalyzers(0, graph);
+            for(int i=0; i < maxTimesteps; i++) {
+                Collection<Node> nodes = graph.getVertices();
+                for(Node node : nodes) {
+                    node.newSignal(graph.getNeighbors(node), trueDistribution.draw());
+                }
+                notifyAllAnalyzers(i+1, graph);
+
+                ConvergenceInspector convergenceInspector = new ConvergenceInspector();
+                boolean converged = convergenceInspector.haveConverged(graph.getVertices());
+                if(converged) { return (i+1); }
+            }
+            return -1;
+        }
+
 	public void notifyAllAnalyzers(int timestep, Graph<Node, Edge> graph) {
 		for(ExperimentAnalyzer analyzer : analyzers) {
 			analyzer.notifyTimestep(graph, timestep);

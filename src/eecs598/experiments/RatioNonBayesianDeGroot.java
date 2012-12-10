@@ -30,6 +30,8 @@ import eecs598.probability.Distribution;
 public class RatioNonBayesianDeGroot {
 	
 	private double ratioNonBayesian;
+
+        static private int stepsToConvergence;
 	
 	private List<Distribution> possibleDistributions;
 	private Factory<Node> nodeFactory; 
@@ -55,17 +57,19 @@ public class RatioNonBayesianDeGroot {
 		
 		Graph<Node, Edge> graph = erdosRenyiGenerator.create();
 		
-		controller.run(graph, 5000);
+                final int numTimesteps = 2000;
+		//controller.run(graph, numTimesteps);
+                RatioNonBayesianDeGroot.stepsToConvergence = controller.runUntilConvergence(graph, numTimesteps);
 		
 		ConvergenceInspector convergenceInspector = new ConvergenceInspector();
 		boolean converged = convergenceInspector.haveConverged(graph.getVertices());
 //		System.out.println("\tConvergence: " + converged);
-//		if(converged) {
-//			System.out.println("\tParameter: " + convergenceInspector.getConvergedParameter(graph.getVertices()));
-//		}
-		if(!converged) {
-			System.out.println("Did not converge");
-		}
+/*		if(converged) {
+                    //System.out.println("\tParameter: " + convergenceInspector.getConvergedParameter(graph.getVertices()));
+                    System.out.println("Converged in " + stepsToConvergence + " steps");
+		} else {
+                    System.out.println("Did not converge");
+                    }*/
 		return graph;
 	}
 	
@@ -111,39 +115,65 @@ public class RatioNonBayesianDeGroot {
 	public static Graph<Node, Edge> runNGaussiansHard(int n, double ratio) {
 		List<Distribution> possibleDistributions = new ArrayList<>();
 		Distribution trueDistribution = DistributionRepository.getNGaussiansHard(n, possibleDistributions);
-		System.out.println("Two Gaussians Hard: True mean = " + trueDistribution.getParameter());
+		//System.out.println(n + " Gaussians Hard: True mean = " + trueDistribution.getParameter());
 		
-		RatioNonBayesianDeGroot onlyNb = new RatioNonBayesianDeGroot(ratio, possibleDistributions, new GaussianFactory());
+		RatioNonBayesianDeGroot mixedNodes = new RatioNonBayesianDeGroot(ratio, possibleDistributions, new GaussianFactory());
 		
 		ExperimentController controller = new ExperimentController(trueDistribution);
 		//controller.attachAnalyzer(new AverageBeliefTracker(System.out, NodeType.NonBayesian));
 		//controller.attachAnalyzer(new AverageBeliefTracker(System.err, NodeType.DeGroot));
 		//controller.attachAnalyzer(new ParameterEstimateTracker(System.err));
+                //controller.attachAnalyzer(new AverageParameterEstimateTracker(System.err));
 		
-		return onlyNb.runErdosRenyi(controller, 20, 0.1);
+                int numNodes = 30;
+		return mixedNodes.runErdosRenyi(controller, numNodes, 0.1);
 	}
 	
 	public static void main(String[] args) throws IOException {
-		double ratio = 0.8;
+            //double ratio = 0.8;
 		//runSanityCheck(ratio);
 		//run2GaussiansEasy(ratio);
 		//Graph graph = run2GaussiansHard(ratio);
-		Graph<Node, Edge> graph = null;
-		for(int i = 0; i < 100; i++) {
-			graph = runNGaussiansHard(20, ratio);
-			ConvergenceInspector convergenceInspector = new ConvergenceInspector();
-			boolean converged = convergenceInspector.haveConverged(graph.getVertices());
-			if(!converged) {
-				NetworkVisualizer visualizer = new NetworkVisualizer();
-				visualizer.showGraph(graph);
-				
-				FileOutputStream underlyingStream = new FileOutputStream("no_convergence_" + i + ".jung");
-			    ObjectOutputStream serializer = new ObjectOutputStream(underlyingStream);
-			    serializer.writeObject(graph);
-			    serializer.close();
-			    underlyingStream.close();   
-			}
-		}
+            final int numTrialsPerRatio = 10;
+            Graph<Node, Edge> graph = null;
+            System.out.println("Ratio\tConvergence/"
+                    + numTrialsPerRatio + "\tMeanStepsToConvergence\tStdDevStepsToConvergence");
+                for(double ratio = 1.0; ratio >= 0.5; ratio -= 0.05) {
+                    List<Integer> stepsToConvergence = new ArrayList<>();
+                    for(int i = 0; i < numTrialsPerRatio; i++) {
+                            graph = runNGaussiansHard(20, ratio);
+                            ConvergenceInspector convergenceInspector = new ConvergenceInspector();
+                            boolean converged = convergenceInspector.haveConverged(graph.getVertices());
+                            if(converged) {
+                                /* System.out.println("Ratio " + ratio + " converged in "
+                                   + RatioNonBayesianDeGroot.stepsToConvergence + " steps");*/
+                                stepsToConvergence.add(RatioNonBayesianDeGroot.stepsToConvergence);
+                            }/* else {
+                                NetworkVisualizer visualizer = new NetworkVisualizer();
+                                visualizer.showGraph(graph);
+
+                                FileOutputStream underlyingStream = new FileOutputStream("no_convergence_" + i + ".jung");
+                                ObjectOutputStream serializer = new ObjectOutputStream(underlyingStream);
+                                serializer.writeObject(graph);
+                                serializer.close();
+                                underlyingStream.close();   
+                            }*/
+                    }
+                    int totalStepsToConvergence = 0;
+                    for(int convergenceSteps : stepsToConvergence) {
+                        totalStepsToConvergence += convergenceSteps;
+                    }
+                    double meanStepsToConvergence = (double)totalStepsToConvergence / stepsToConvergence.size();
+
+                    // Calculate std deviation
+                    double sumOfSquaredDiffs = 0;
+                    for(int convergenceSteps : stepsToConvergence) {
+                        sumOfSquaredDiffs += Math.pow(convergenceSteps - meanStepsToConvergence, 2);
+                    }
+                    double stdDevStepsToConvergence = Math.sqrt(sumOfSquaredDiffs / stepsToConvergence.size());
+                    System.out.printf("*****\t%.2f\t%d\t%f\t%f%n", ratio, stepsToConvergence.size(),
+                            meanStepsToConvergence, stdDevStepsToConvergence);
+                }
 		NetworkVisualizer visualizer = new NetworkVisualizer();
 		visualizer.showGraph(graph);
 		
