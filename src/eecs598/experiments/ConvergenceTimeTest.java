@@ -72,7 +72,7 @@ public class ConvergenceTimeTest {
 	 */
 	public MeanAndStdDev run(int nRuns, Factory<ExperimentalSetup> setupFactory) throws IOException {
 		
-		NonBayesianNode.listensToSignalRatio = 0.4;
+		NonBayesianNode.listensToSignalRatio = 0.6;
 		
 		List<Double> convergenceTimes = new ArrayList<Double>();
 		ExperimentalSetup setup = setupFactory.create();
@@ -91,10 +91,10 @@ public class ConvergenceTimeTest {
 		
 		Factory<UndirectedGraph<Node, Edge>> graphFactory = new GraphFactory();
 		
-		GraphGenerator<Node, Edge> generator = generatorFactory.create(nodeFactory, edgeFactory, graphFactory);
 		GraphConnector connector = new GraphConnector();
 		
 		for(int i = 0; i < nRuns; i++) {
+			GraphGenerator<Node, Edge> generator = generatorFactory.create(nodeFactory, edgeFactory, graphFactory);
 			Graph<Node, Edge> graph = generator.create();
 			connector.makeConnected(graph, edgeFactory);
 			if(!connector.isConnected(graph)) throw new RuntimeException("Graph is not connected!");
@@ -103,13 +103,13 @@ public class ConvergenceTimeTest {
 				//System.out.println(timesteps);
 				convergenceTimes.add((double)timesteps);
 			} catch(MaxTimestepsExceededException e) {
-				//experiment.run(graph, 1);
-				try {
-					experiment.runUntilConvergence(graph);
-				} catch (MaxTimestepsExceededException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+//				//experiment.run(graph, 1);
+//				try {
+//					experiment.runUntilConvergence(graph);
+//				} catch (MaxTimestepsExceededException e1) {
+//					// TODO Auto-generated catch block
+//					e1.printStackTrace();
+//				}
 				String filename =  "no_convergence_" + new Date().getTime() + ".jung";
 				saveGraph(graph, filename); 
 				System.out.println("\tNo convergence: saved to " + filename);
@@ -131,8 +131,8 @@ public class ConvergenceTimeTest {
 	
 	public static void main(String[] args) throws IOException {
 		//String arg = args[0];
-		String arg = "complete"; 
-		if(arg.equals("barabasi")) {
+		String arg = "barabasi"; 
+		if(arg.equals("kleinberg")) {
 			runKleinberg();
 		} else if(arg.equals("barabasi")) {
 			runBarabasiAlbert();
@@ -165,7 +165,7 @@ public class ConvergenceTimeTest {
 		int maxNumTimesteps = 490; // max total size is 500
 
 		System.out.format("Barbasi-Albert Preferential Attachment (initial node count = %d, edges per timestep = %d,"+
-		"minNumTimesteps = %d, maxNumTimesteps = %d\n", initialNodeCount, edgesPerTimestep, minNumTimesteps, maxNumTimesteps);
+		"minNumTimesteps = %d, maxNumTimesteps = %d)\n", initialNodeCount, edgesPerTimestep, minNumTimesteps, maxNumTimesteps);
 		
 		System.out.println("Size\tMean\tStdDev");
 		for(int numTimesteps = minNumTimesteps; numTimesteps < maxNumTimesteps; numTimesteps+=20) {
@@ -186,7 +186,7 @@ public class ConvergenceTimeTest {
 		int maxNodeCount = 500; // max total size is 500
 
 		System.out.format("Eppstein Power Law Attachment (minNodeCount = %d, maxNodeCount = %d,"+
-		"edgeToNodeRatio = %d, generationTimesteps = %d\n", minNodeCount, maxNodeCount, edgeToNodeRatio, generationTimesteps);
+		"edgeToNodeRatio = %d, generationTimesteps = %d)\n", minNodeCount, maxNodeCount, edgeToNodeRatio, generationTimesteps);
 		
 		System.out.println("Size\tMean\tStdDev");
 		for(int nodeCount = minNodeCount; nodeCount < maxNodeCount; nodeCount+=20) {
@@ -207,7 +207,7 @@ public class ConvergenceTimeTest {
 		int minNodeCount = 15; // min total size is 15
 		int maxNodeCount = 500; // max total size is 500
 
-		System.out.format("Complete Graph (minNodeCount = %d, maxNodeCount = %d\n", minNodeCount, maxNodeCount);
+		System.out.format("Complete Graph (minNodeCount = %d, maxNodeCount = %d)\n", minNodeCount, maxNodeCount);
 		
 		System.out.println("Size\tMean\tStdDev");
 		for(int nodeCount = minNodeCount; nodeCount < maxNodeCount; nodeCount+=20) {

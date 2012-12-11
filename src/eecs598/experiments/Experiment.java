@@ -7,6 +7,7 @@ import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.UndirectedGraph;
 import eecs598.Edge;
 import eecs598.Node;
+import eecs598.experiments.analyzer.ExperimentAnalyzer;
 
 /**
  * 
@@ -40,6 +41,10 @@ public class Experiment {
 	public Graph<Node, Edge> run(Graph<Node, Edge> graph, int numTimesteps) {
 		getExperimentController().run(graph, numTimesteps);
 		return graph;
+	}
+	
+	public void attachAnalyzer(ExperimentAnalyzer analyzer) {
+		getExperimentController().attachAnalyzer(analyzer);
 	}
 
 	/**

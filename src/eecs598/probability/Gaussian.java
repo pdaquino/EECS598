@@ -3,6 +3,7 @@ package eecs598.probability;
 import java.io.Serializable;
 
 import cern.jet.random.Normal;
+import cern.jet.random.engine.MersenneTwister;
 import cern.jet.random.engine.RandomEngine;
 
 public class Gaussian implements Distribution, Serializable {
@@ -14,7 +15,8 @@ public class Gaussian implements Distribution, Serializable {
 	
 	public Gaussian(double mean) {
 		this.mean = mean;
-		this.normal = new Normal(mean, stdDev, RandomEngine.makeDefault());
+		//this.normal = new Normal(mean, stdDev, RandomEngine.makeDefault());
+		this.normal = new Normal(mean, stdDev, new MersenneTwister());
 	}
 	
 	@Override

@@ -1,5 +1,5 @@
 %\documentclass[a4paper,12pt]{article}
-\documentclass[letterpaper, 10pt, conference]{ieeeconf}
+\documentclass[letterpaper, 11pt, conference]{ieeeconf}
 \usepackage{amsmath} % For 'cases' curly brace
 \usepackage{amsfonts} % For bold number set font
 \usepackage{graphicx}
@@ -237,7 +237,7 @@ In order to seek insight about the behavior of our model we performed a series o
 \subsection{Node Ratio vs. Convergence Time}
 \label{sec:node_ratio_vs_convergence_time}
 
-In order to characterize the effect of naive DeGroot nodes on Non-Bayesian social learning we simulated time taken for convergence versus the ratio of Non-Bayesian to DeGroot nodes in a network.  This simulation was performed for a several graph types: Barabasi-Albert preferential attachment~\cite{Barabasi}, Kleinberg small-world~\cite{KleinbergSmallWorld}, Eppstein power law~\cite{Eppstein}, and the complete graph.  To simulate the spread of information throughout the network, only 50\% of the Non-Bayesian received any signals; the other 50\% needed to rely completely on learning from their neighbors.  Each trial was run 100 times for each ratio percentage between from 1-100\%, for a total of 10,000 trials for each graph type.
+In order to characterize the effect of naive DeGroot nodes on Non-Bayesian social learning we simulated the time taken for convergence versus the ratio of Non-Bayesian to DeGroot nodes in a network.  This simulation was performed for a several graph types: Barabasi-Albert preferential attachment~\cite{Barabasi}, Kleinberg small-world~\cite{KleinbergSmallWorld}, Eppstein power law~\cite{Eppstein}, and the complete graph.  To simulate the spread of information throughout the network, only 50\% of the Non-Bayesian received any signals; the other 50\% needed to rely completely on learning from their neighbors.  Each trial was run 100 times for each ratio percentage between from 1-100\%, for a total of 10,000 trials for each graph type.
 
 \begin{figure*}[t]
 %\hspace*{0.1in}
@@ -248,20 +248,21 @@ In order to characterize the effect of naive DeGroot nodes on Non-Bayesian socia
 \label{fig:nb_ratio}
 \end{figure*}
 
-The results, shown in figure~\ref{fig:nb_ratio}, are somewhat counterintuitive: the presence of naive DeGroot nodes actually tends to accelerate the speed of convergence.  Further investigation showed this to be a result of the process used to convert DeGroot belief to Non-Bayesian belief.  The conversion method of section~\ref{sec:likelihood_metric} tends to result in a belief distribution that is heavily skewed to a single $\theta_i$.  This relative ``certainty'' of the DeGroot nodes is picked up by their Non-Bayesian neighbors, bringing them more quickly to convergence.
+The results, shown in Figure~\ref{fig:nb_ratio}, are somewhat counterintuitive: the presence of naive DeGroot nodes actually tends to accelerate the speed of convergence.  Further investigation showed this to be a result of the process used to convert DeGroot beliefs to Non-Bayesian belief.  The conversion method of section~\ref{sec:likelihood_metric} tends to result in a belief distribution that is heavily skewed to a single $\theta_i$.  This relative ``certainty'' of the DeGroot nodes is picked up by their Non-Bayesian neighbors, bringing them more quickly to convergence.
 
-We can see this process in more detail in figure~\ref{fig:dg_faster}.
+We can see this process in more detail in Figure~\ref{fig:dg_faster}, which shows the average beliefs in $\Theta^*$ for the intial steps of two trials on a complete graph. It is clear that the DeGroot nodes essentially act as amplifiers, magnifying the initial belief updates of the Non-Bayesian nodes. This will in turn strengthen the Non-Bayesian's nodes beliefs in $\Theta*$ (through Equation \ref{eq:non_bayesian_update}), which are then incorporated into the DeGroot nodes' parameter estimates. This feedback cycle increases the speed of convergence.
+
+In essence, this happens because belief estimation algorithm of the DeGroot nodes is inherently aggressive. It is interesting to note that this can have negative effects on convergence when there is significant noise in the signal received by the Non-Bayesian nodes. If a Non-Bayesian node receives an ``unlucky'' draw that skews its belief distribution away from $\Theta*$, this error will be amplified by the DeGroot nodes. Since there was no noise in our simulations, the presence of DeGroot nodes is beneficial. We find it interesting that the presence of naive, non-observant agents in a graph can actually accelerate the rate of learning due to eagerness of these nodes to settle on a single set of beliefs.
 
 \begin{figure}[th]
 %\hspace*{0.1in}
 %\centerline{\includegraphics[scale=0.8]{figures/dg_faster}}
 \centering
 \includegraphics[width=0.48\textwidth]{figures/dg_faster}
-\caption{@todo[DDC]}
+\caption{The average beliefs in $\Theta^*$, the true distribution, for the two types of nodes during simulations with 0\% and 20\% of DeGroot nodes in a complete graph. The possible distributions were Gaussians centered at 100 and 105 with $\sigma=1$. All random seeds were fixed such that in both runs the Non-Bayesian nodes received the exact same sequence of draws. DeGroot nodes' beliefs were estimated using the distance metric. The figure shows how DeGroot nodes help amplify the initial belief updates of Non-Bayesian nodes, which leads to overall faster convergence.}
 \label{fig:dg_faster}
 \end{figure}
 
-Thus we see that the presence of naive, non-observant agents in a graph can actually accelerate the rate of learning due to eagerness of these nodes to settle on a single set of beliefs.
 
 \subsection{Graph Size vs. Convergence Time}
 

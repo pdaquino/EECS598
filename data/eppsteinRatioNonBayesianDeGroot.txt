@@ -1,4 +1,3 @@
-java -classpath .:eecs598/lib/jung-algorithms-2.0.1.jar:eecs598/lib/jung-graph-impl-2.0.1.jar:eecs598/lib/jung-visualization-2.0.1.jar eecs598/experiments/RatioNonBayesianDeGroot 
 Ratio	Convergence/100	MeanStepsToConvergence	StdDevStepsToConvergence
 1.00	100	82.610000	20.105668
 0.99	100	78.070000	20.950539

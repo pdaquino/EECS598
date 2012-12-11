@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 import java.util.Date;
 
 import org.apache.commons.collections15.Factory;
@@ -11,11 +12,14 @@ import org.apache.commons.collections15.Factory;
 import edu.uci.ics.jung.algorithms.generators.GraphGenerator;
 import edu.uci.ics.jung.graph.Graph;
 import edu.uci.ics.jung.graph.UndirectedGraph;
+import eecs598.DistanceBeliefEstimator;
 import eecs598.Edge;
 import eecs598.ManyRandomDrawsBeliefEstimator;
 import eecs598.Node;
 import eecs598.NonBayesianNode;
 import eecs598.NopParameterEstimator;
+import eecs598.experiments.analyzer.AverageBeliefTracker;
+import eecs598.experiments.analyzer.NodeType;
 import eecs598.experiments.visualization.NetworkVisualizer;
 import eecs598.factories.EdgeFactory;
 import eecs598.factories.GraphFactory;
@@ -68,11 +72,15 @@ public class ConvergenceStressTest {
 			experiment.setConvergenceTestStep(convergenceTestGranularity);
 			experiment.setMaxConvergenceTimesteps(maxTimesteps);
 			
+			experiment.attachAnalyzer(new AverageBeliefTracker(new PrintStream("nonBayesianBeliefs.txt"), NodeType.NonBayesian));
+			experiment.attachAnalyzer(new AverageBeliefTracker(new PrintStream("deGrootBeliefs.txt"), NodeType.DeGroot));
+			
 			Factory<Node> nodeFactory = new RatioNodeFactory(
 					ratioNonBayesian,
 					setup.getPossibleDistributions(),
 					new NopParameterEstimator(),
-					new ManyRandomDrawsBeliefEstimator(setup.getDistributionFactory()));
+					//new ManyRandomDrawsBeliefEstimator(setup.getDistributionFactory()));
+					new DistanceBeliefEstimator());
 			
 			Factory<Edge> edgeFactory = new EdgeFactory();
 			
@@ -115,9 +123,10 @@ public class ConvergenceStressTest {
 	
 	public static void main(String[] args) throws IOException {
 		ConvergenceStressTest stressTest = new ConvergenceStressTest();
-		stressTest.setGeneratorFactory(new GeneratorFactories.KleinbergGenerator(10, 2));
+		//stressTest.setGeneratorFactory(new GeneratorFactories.KleinbergGenerator(10, 2));
+		stressTest.setGeneratorFactory(new GeneratorFactories.ErdosRenyiFactory(20, 1.0));
 		stressTest.setConvergenceTestGranularity(1);
 		stressTest.setMaxTimesteps(100);
-		stressTest.run(50, ExperimentalSetup.nGaussiansHardFactory(80));
+		stressTest.run(1, ExperimentalSetup.nGaussiansMediumFactory(2));
 	}
 }

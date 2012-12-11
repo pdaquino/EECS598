@@ -98,6 +98,7 @@ public class DistributionRepository {
 			possibleDistributions.add(new Gaussian(startingMean + i*step));
 		}
 		
-		return chooseRandom(possibleDistributions);
+		//return chooseRandom(possibleDistributions);
+		return possibleDistributions.get(0);
 	}
 }

@@ -15,14 +15,14 @@ public class LoadGraph {
 	public static void main(String args[]) throws ClassNotFoundException, IOException {
 	    NonBayesianNode.listensToSignalRatio = 0.9;
 	    
-		FileInputStream underlyingStream2 = new FileInputStream( "no_convergence_1355182809308.jung" ); 
+		FileInputStream underlyingStream2 = new FileInputStream( "no_convergence_1355184387859.jung" ); 
 		//FileInputStream underlyingStream2 = new FileInputStream( "no_conv_2.jung" );
 	    ObjectInputStream deserializer = new ObjectInputStream( underlyingStream2 );
 	    UndirectedSparseGraph<Node, Edge> loadedGraph = (UndirectedSparseGraph<Node, Edge>) deserializer.readObject(); //EXCEPTION THROWN HERE
 	    deserializer.close();
 	    underlyingStream2.close();
 	    
-	    //resetGraph(loadedGraph);
+	    
 	    
 	    NetworkVisualizer visualizer = new NetworkVisualizer();
 	    visualizer.showGraph(loadedGraph);
@@ -30,10 +30,13 @@ public class LoadGraph {
 	    ConvergenceInspector inspector = new ConvergenceInspector();
 	    System.out.println("Convergence before: " + inspector.haveConverged(loadedGraph.getVertices()));
 	    
-	    ExperimentController controller = new ExperimentController(new Gaussian(105.0));
-	    //controller.run(loadedGraph, 400);
+	    ExperimentController controller = new ExperimentController(new Gaussian(130.0));
+	    System.in.read();
+	    resetGraph(loadedGraph);
+	    controller.run(loadedGraph, 400);
+	    System.in.read();
 	    visualizer.refresh();
-	    //controller.run(loadedGraph, 3000);
+	    controller.run(loadedGraph, 3000);
 	    
 	    System.out.println("Convergence after: " + inspector.haveConverged(loadedGraph.getVertices()));
 	    //visualizer.showGraph(loadedGraph);
