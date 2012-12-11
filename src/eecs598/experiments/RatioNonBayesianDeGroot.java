@@ -53,11 +53,12 @@ public class RatioNonBayesianDeGroot {
 	}
 
 	public Graph<Node, Edge> runExperiment(ExperimentController controller, int numVertices, double p) {
-		ErdosRenyiGenerator<Node, Edge> erdosRenyiGenerator = new ErdosRenyiGenerator<Node, Edge>(
-				graphFactory, nodeFactory, edgeFactory, numVertices, p);
+            //		ErdosRenyiGenerator<Node, Edge> erdosRenyiGenerator = new ErdosRenyiGenerator<Node, Edge>(
+            //				graphFactory, nodeFactory, edgeFactory, numVertices, p);
 		
                 //		Graph<Node, Edge> graph = erdosRenyiGenerator.create();
-                Graph<Node, Edge> graph = new GeneratorFactories.ErdosRenyiFactory(15, 1.0).create(nodeFactory, edgeFactory, graphFactory).create();
+                //Graph<Node, Edge> graph = new GeneratorFactories.ErdosRenyiFactory(15, 1.0).create(nodeFactory, edgeFactory, graphFactory).create();
+            Graph<Node, Edge> graph = new GeneratorFactories.KleinbergGenerator(5, 2).create(nodeFactory, edgeFactory, graphFactory).create();
                 GraphConnector connector = new GraphConnector();
                 connector.makeConnected(graph, edgeFactory);
 		
@@ -68,12 +69,12 @@ public class RatioNonBayesianDeGroot {
 		ConvergenceInspector convergenceInspector = new ConvergenceInspector();
 		boolean converged = convergenceInspector.haveConverged(graph.getVertices());
 //		System.out.println("\tConvergence: " + converged);
-/*		if(converged) {
+		if(converged) {
                     //System.out.println("\tParameter: " + convergenceInspector.getConvergedParameter(graph.getVertices()));
                     System.out.println("Converged in " + stepsToConvergence + " steps");
 		} else {
                     System.out.println("Did not converge");
-                    }*/
+                    }
 		return graph;
 	}
 	
