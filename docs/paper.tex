@@ -234,12 +234,18 @@ We have observed in simulation that the noise from the DeGroot to Non-Bayesian c
 
 In order to seek insight about the behavior of our model we performed a series of simulations using the JUNG network/graph software library \cite{website:JUNGGraphLibrary}.  For each simulation, $\Theta$ consisted of two Gaussian distributions with means of 100 and 105 and standard deviation of 1.  Each trial was run until all nodes have converged upon the true state or some maximum number of timesteps had elapsed.
 
+\subsection{Random Draw Belief Conversion Method}
+
+An important discovery from simulation was that the random draw method of conversion from DeGroot to Non-Bayesian belief described in section~\ref{sec:draw_from_degroot} can lead to unrealistically skewed belief distributions.  This primarily occurred in cases using Gaussian distributions where the means of the possible distributions represented by each belief state $\theta_i \in \Theta$ are relatively far apart.  For example, suppose that $n = 2$, $\theta_0 \sim N(100, 1)$ and $\theta_1 \sim N(105, 1)$.  A DeGroot node $d$ will have an initial belief of 102.5, and will therefore create a Bayesian belief distribution by drawing from the distribution $N(102.5, 1)$.  There is now a significant (0.318) probability that it will draw a point at least one standard deviation outside of the mean, e.g. $s_{d,t}^\prime = 101.5$.  But the value 101.5 is significantly more likely to have been drawn from the probability distribution $N(100, 1)$ versus the distribution $N(105, 1)$.  Therefore $d$ will report that it is almost certain that the true state is $\theta_0 \sim N(100, 1)$ when in reality it should have a relatively evenly spread belief distribution.
+
+After the discovery of this difficulty, we evaluated the distance metric described in section~\ref{sec:likelihood_metric} and found it to give much more desirable results.  Therefore that method was used throughout all simulations described in the remainder of this section.
+
 \subsection{Node Ratio vs. Convergence Time}
 \label{sec:node_ratio_vs_convergence_time}
 
-In order to characterize the effect of naive DeGroot nodes on Non-Bayesian social learning we simulated time taken for convergence versus the ratio of Non-Bayesian to DeGroot nodes in a network.  This simulation was performed for a several graph types: Barabasi-Albert preferential attachment~\cite{Barabasi}, Kleinberg small-world~\cite{KleinbergSmallWorld}, Eppstein power law~\cite{Eppstein}, and the complete graph.  To simulate the spread of information throughout the network, only 50\% of the Non-Bayesian received any signals; the other 50\% needed to rely completely on learning from their neighbors.  Each trial was run 100 times for each ratio percentage between from 1-100\%, for a total of 10,000 trials for each graph type.
+In order to characterize the effect of naive DeGroot nodes on Non-Bayesian social learning we simulated time taken for convergence versus the ratio of Non-Bayesian to DeGroot nodes in a network.  This simulation was performed for a several graph types: Barabasi-Albert preferential attachment~\cite{Barabasi}, Kleinberg small-world~\cite{KleinbergSmallWorld}, Eppstein power law~\cite{Eppstein}, and the complete graph.  To simulate the spread of information throughout the network, only 50\% of the Non-Bayesian nodes received any signals; the other 50\% needed to rely completely on learning from their neighbors.  Each trial was run 100 times for each ratio percentage between from 1-100\%, for a total of 10,000 trials for each graph type.
 
-\begin{figure*}[t]
+\begin{figure*}[h]
 %\hspace*{0.1in}
 %\centerline{\includegraphics[scale=0.8]{figures/nb_ratio}}
 \centering
