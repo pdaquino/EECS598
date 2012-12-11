@@ -165,5 +165,9 @@ public class DeGrootNode extends Node implements Serializable {
 		this.estimate = -1.0;
 		
 	}
+	
+	public String toString() {
+		return "DeGrootNode " + getId() + "[ param = " + estimate + "] [" + getBeliefs() + "]";
+	}
 
 }

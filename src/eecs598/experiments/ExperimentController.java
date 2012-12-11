@@ -1,5 +1,6 @@
 package eecs598.experiments;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -47,7 +48,10 @@ public class ExperimentController {
          */
         public int runUntilConvergence(Graph<Node, Edge> graph, int maxTimesteps) {
             notifyAllAnalyzers(0, graph);
+            //NetworkVisualizer visualizer = new NetworkVisualizer();
+		    //visualizer.showGraph(graph);
             for(int i=0; i < maxTimesteps; i++) {
+                //showAndStop(visualizer, graph, i);
                 Collection<Node> nodes = graph.getVertices();
                 for(Node node : nodes) {
                     node.newSignal(graph.getNeighbors(node), trueDistribution.draw());
@@ -60,6 +64,22 @@ public class ExperimentController {
             }
             return -1;
         }
+
+	private void showAndStop(NetworkVisualizer visualizer, Graph<Node, Edge> graph, int i) {
+		 visualizer.refresh();
+		 for(Node n : graph.getVertices()) {
+				System.out.println("\t" + n);
+			}
+		    System.out.println(i + " timesteps. Press enter to continue:");
+		    try {
+				System.in.read(new byte[2]);
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
 
 	public void notifyAllAnalyzers(int timestep, Graph<Node, Edge> graph) {
 		for(ExperimentAnalyzer analyzer : analyzers) {
