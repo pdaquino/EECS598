@@ -135,7 +135,7 @@ public class DeGrootNode extends Node implements Serializable {
 			return 0;
 		}
 		if(neighbor instanceof NonBayesianNode) {
-			return 2;
+			return 1;
 		} else {
 			return 1;
 		}

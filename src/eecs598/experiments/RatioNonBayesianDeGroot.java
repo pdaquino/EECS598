@@ -118,7 +118,7 @@ public class RatioNonBayesianDeGroot {
 	
 	public static Graph<Node, Edge> runNGaussiansHard(int n, double ratio) {
 		List<Distribution> possibleDistributions = new ArrayList<>();
-		Distribution trueDistribution = DistributionRepository.getNGaussiansHard(n, possibleDistributions);
+		Distribution trueDistribution = DistributionRepository.getNGaussiansMedium(2, possibleDistributions);
 		//System.out.println(n + " Gaussians Hard: True mean = " + trueDistribution.getParameter());
 		
 		RatioNonBayesianDeGroot mixedNodes = new RatioNonBayesianDeGroot(ratio, possibleDistributions, new GaussianFactory());
@@ -142,7 +142,7 @@ public class RatioNonBayesianDeGroot {
             Graph<Node, Edge> graph = null;
             System.out.println("Ratio\tConvergence/"
                     + numTrialsPerRatio + "\tMeanStepsToConvergence\tStdDevStepsToConvergence");
-                for(double ratio = 1.0; ratio >= 0.5; ratio -= 0.05) {
+                for(double ratio = 1.0; ratio >= 0.0; ratio -= 0.05) {
                     List<Integer> stepsToConvergence = new ArrayList<>();
                     for(int i = 0; i < numTrialsPerRatio; i++) {
                             graph = runNGaussiansHard(20, ratio);
