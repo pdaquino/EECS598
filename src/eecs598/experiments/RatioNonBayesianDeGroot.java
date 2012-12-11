@@ -60,22 +60,22 @@ public class RatioNonBayesianDeGroot {
             //				graphFactory, nodeFactory, edgeFactory, numVertices, p);
                 //		Graph<Node, Edge> graph = erdosRenyiGenerator.create();
 
-                /*Graph<Node, Edge> graph = new GeneratorFactories.ErdosRenyiFactory(15, 1.0)
-                        .create(nodeFactory, edgeFactory, graphFactory).create();
-            Graph<Node, Edge> graph = new GeneratorFactories.KleinbergGenerator(5, 2)
-                    .create(nodeFactory, edgeFactory, graphFactory).create();
+                Graph<Node, Edge> graph = new GeneratorFactories.ErdosRenyiFactory(15, 1.0)
+                  .create(nodeFactory, edgeFactory, graphFactory).create();
+            /*            Graph<Node, Edge> graph = new GeneratorFactories.KleinbergGenerator(5, 2)
+                          .create(nodeFactory, edgeFactory, graphFactory).create();*/
 
-            int initialNodeCount = 10;
+            /*            int initialNodeCount = 10;
             int edgesPerTimestep = 5;
             int generationTimesteps = 10;
             Graph<Node, Edge> graph = new GeneratorFactories.BarabasiAlbertFactory(initialNodeCount, edgesPerTimestep, generationTimesteps)
             .create(nodeFactory, edgeFactory, graphFactory).create();*/
 
-            int nodeCount = 30;
+            /*            int nodeCount = 30;
             int edgeToNodeRatio = 3;
             int generationTimesteps = 50;
             Graph<Node, Edge> graph = new GeneratorFactories.EppsteinFactory(nodeCount, edgeToNodeRatio * nodeCount, generationTimesteps)
-                    .create(nodeFactory, edgeFactory, graphFactory).create();
+            .create(nodeFactory, edgeFactory, graphFactory).create();*/
 
             GraphConnector connector = new GraphConnector();
             connector.makeConnected(graph, edgeFactory);
@@ -87,12 +87,12 @@ public class RatioNonBayesianDeGroot {
 		ConvergenceInspector convergenceInspector = new ConvergenceInspector();
 		boolean converged = convergenceInspector.haveConverged(graph.getVertices());
 //		System.out.println("\tConvergence: " + converged);
-		if(converged) {
+/*		if(converged) {
                     //System.out.println("\tParameter: " + convergenceInspector.getConvergedParameter(graph.getVertices()));
                     System.out.println("Converged in " + stepsToConvergence + " steps");
 		} else {
                     System.out.println("Did not converge");
-                    }
+                    }*/
 		return graph;
 	}
 	
@@ -157,11 +157,11 @@ public class RatioNonBayesianDeGroot {
 		//runSanityCheck(ratio);
 		//run2GaussiansEasy(ratio);
 		//Graph graph = run2GaussiansHard(ratio);
-            final int numTrialsPerRatio = 10;
+            final int numTrialsPerRatio = 100;
             Graph<Node, Edge> graph = null;
             System.out.println("Ratio\tConvergence/"
                     + numTrialsPerRatio + "\tMeanStepsToConvergence\tStdDevStepsToConvergence");
-                for(double ratio = 1.0; ratio >= 0.0; ratio -= 0.05) {
+                for(double ratio = 1.0; ratio >= 0.0; ratio -= 0.01) {
                     List<Integer> stepsToConvergence = new ArrayList<>();
                     for(int i = 0; i < numTrialsPerRatio; i++) {
                             graph = runNGaussiansHard(20, ratio);
@@ -194,7 +194,7 @@ public class RatioNonBayesianDeGroot {
                         sumOfSquaredDiffs += Math.pow(convergenceSteps - meanStepsToConvergence, 2);
                     }
                     double stdDevStepsToConvergence = Math.sqrt(sumOfSquaredDiffs / stepsToConvergence.size());
-                    System.out.printf("*****\t%.2f\t%d\t%f\t%f%n", ratio, stepsToConvergence.size(),
+                    System.out.printf("%.2f\t%d\t%f\t%f%n", ratio, stepsToConvergence.size(),
                             meanStepsToConvergence, stdDevStepsToConvergence);
                 }
 		NetworkVisualizer visualizer = new NetworkVisualizer();
