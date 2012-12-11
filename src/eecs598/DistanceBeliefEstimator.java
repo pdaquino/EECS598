@@ -17,7 +17,8 @@ public class DistanceBeliefEstimator implements BeliefEstimator, Serializable {
 				possibleDistributions.size());
 		if(parameterEstimate != -1) {
 			for (Distribution candidate : possibleDistributions) {
-				double belief = Math.exp(-Math.pow(candidate.getParameter() - parameterEstimate, 2));
+                            //double belief = Math.exp(-Math.pow(candidate.getParameter() - parameterEstimate, 2));
+                            double belief = Math.pow(Math.max(Math.abs(candidate.getParameter() - parameterEstimate),0.0000000001), -2);
 				beliefs.put(candidate.getParameter(), belief);
 			}
 			ProbabilityUtil.normalizeToOne(beliefs);

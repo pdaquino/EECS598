@@ -15,6 +15,7 @@ import eecs598.Edge;
 import eecs598.ManyRandomDrawsBeliefEstimator;
 import eecs598.DistanceBeliefEstimator;
 import eecs598.Node;
+import eecs598.NonBayesianNode;
 import eecs598.NopParameterEstimator;
 import eecs598.RandomDrawBeliefEstimator;
 import eecs598.experiments.analyzer.AverageBeliefTracker;
@@ -53,14 +54,32 @@ public class RatioNonBayesianDeGroot {
 	}
 
 	public Graph<Node, Edge> runExperiment(ExperimentController controller, int numVertices, double p) {
-		ErdosRenyiGenerator<Node, Edge> erdosRenyiGenerator = new ErdosRenyiGenerator<Node, Edge>(
-				graphFactory, nodeFactory, edgeFactory, numVertices, p);
-		
+            NonBayesianNode.listensToSignalRatio = 0.5;
+
+            //		ErdosRenyiGenerator<Node, Edge> erdosRenyiGenerator = new ErdosRenyiGenerator<Node, Edge>(
+            //				graphFactory, nodeFactory, edgeFactory, numVertices, p);
                 //		Graph<Node, Edge> graph = erdosRenyiGenerator.create();
-                Graph<Node, Edge> graph = new GeneratorFactories.ErdosRenyiFactory(15, 1.0).create(nodeFactory, edgeFactory, graphFactory).create();
-                GraphConnector connector = new GraphConnector();
-                connector.makeConnected(graph, edgeFactory);
-		
+
+                /*Graph<Node, Edge> graph = new GeneratorFactories.ErdosRenyiFactory(15, 1.0)
+                        .create(nodeFactory, edgeFactory, graphFactory).create();
+            Graph<Node, Edge> graph = new GeneratorFactories.KleinbergGenerator(5, 2)
+                    .create(nodeFactory, edgeFactory, graphFactory).create();
+
+            int initialNodeCount = 10;
+            int edgesPerTimestep = 5;
+            int generationTimesteps = 10;
+            Graph<Node, Edge> graph = new GeneratorFactories.BarabasiAlbertFactory(initialNodeCount, edgesPerTimestep, generationTimesteps)
+            .create(nodeFactory, edgeFactory, graphFactory).create();*/
+
+            int nodeCount = 30;
+            int edgeToNodeRatio = 3;
+            int generationTimesteps = 50;
+            Graph<Node, Edge> graph = new GeneratorFactories.EppsteinFactory(nodeCount, edgeToNodeRatio * nodeCount, generationTimesteps)
+                    .create(nodeFactory, edgeFactory, graphFactory).create();
+
+            GraphConnector connector = new GraphConnector();
+            connector.makeConnected(graph, edgeFactory);
+
                 final int numTimesteps = 2000;
 		//controller.run(graph, numTimesteps);
                 RatioNonBayesianDeGroot.stepsToConvergence = controller.runUntilConvergence(graph, numTimesteps);
@@ -68,12 +87,12 @@ public class RatioNonBayesianDeGroot {
 		ConvergenceInspector convergenceInspector = new ConvergenceInspector();
 		boolean converged = convergenceInspector.haveConverged(graph.getVertices());
 //		System.out.println("\tConvergence: " + converged);
-/*		if(converged) {
+		if(converged) {
                     //System.out.println("\tParameter: " + convergenceInspector.getConvergedParameter(graph.getVertices()));
                     System.out.println("Converged in " + stepsToConvergence + " steps");
 		} else {
                     System.out.println("Did not converge");
-                    }*/
+                    }
 		return graph;
 	}
 	

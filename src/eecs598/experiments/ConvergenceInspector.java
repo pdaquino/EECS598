@@ -34,7 +34,7 @@ public class ConvergenceInspector {
 		
 		separateNodeTypes(nodes, nonBayesianNodes, deGrootNodes, null);
 		
-		return haveNonBayesianNodesConverged(nonBayesianNodes);
+		return haveNonBayesianNodesConverged(nonBayesianNodes) && haveDeGrootNodesConverged(deGrootNodes);
 	}
 	
 	public double getConvergedParameter(Collection<Node> nodes) {
@@ -77,6 +77,21 @@ public class ConvergenceInspector {
 		return true;
 	}
 	
+    protected boolean haveDeGrootNodesConverged(Collection<DeGrootNode> nodes) {
+        boolean isFirst = true;
+        double firstParameter = 0.0;
+        for(DeGrootNode node : nodes) {
+            if(isFirst) {
+                firstParameter = node.getParameterEstimate();
+                isFirst = false;
+            }
+            if(Math.abs(node.getParameterEstimate() - firstParameter) > beliefConvergenceThreshold) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 	protected double getNonBayesianConvergedParameter(Collection<NonBayesianNode> nodes) {
 		for (NonBayesianNode node : nodes) {
 			Double convergedParameter = getConvergedParameter(node.getBeliefs());
