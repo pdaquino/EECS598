@@ -119,7 +119,6 @@ in \cite{Jadbabaie2012}.  We denote the belief of a node $i$ that it will receiv
 m_{i,t}(s_i) = \int_\Theta \ell_i(s_i|\theta)d\mu_{i,t}(\theta) = \sum_{k=1}^n \ell_i(s_i|\theta_k)\mu_{i,t}(\theta_k)
 \end{equation}
 
-% @todo[DDC] More detail for derivation/explanation of likelihood?
 The likelihood function $\ell_i(s_i|\theta_k)$ can be obtained from the probability distribution function represented by the belief state $\theta_k$.  As an example, for the trapezoidal distribution described in section~\ref{sec:trapezoidal_distribution}, the likelihood function would be
 
 \begin{equation}
@@ -231,24 +230,27 @@ for each incorrect state $\{ \theta_w \in \Theta : \theta_w \neq \theta^* \}$.  
 We have observed in simulation that the noise from the DeGroot to Non-Bayesian conversion can overcome the rate of learning from the signal observations and thus prevent convergence of the network.  However, it is difficult to determine exactly what conditions must hold for this to be the case.  The level of impact from the conversion noise will depend on many factors including network structure, trust values between nodes, and the number of states $\theta_i \in \Theta$ used to quantize possible values of $m^*$.  We have therefore found it difficult to prove convergence results with any significant level of generality.
 
 \section{Simulation}
+\label{sec:simulation}
 
 In order to seek insight about the behavior of our model we performed a series of simulations using the JUNG network/graph software library \cite{website:JUNGGraphLibrary}.  For each simulation, $\Theta$ consisted of two Gaussian distributions with means of 100 and 105 and standard deviation of 1.  Each trial was run until all nodes have converged upon the true state or some maximum number of timesteps had elapsed.
 
 \subsection{Node Ratio vs. Convergence Time}
-\label{sec:simulation}
+\label{sec:node_ratio_vs_convergence_time}
 
-In order to characterize the effect of naive DeGroot nodes on Non-Bayesian social learning we simulated time taken for convergence versus the ratio of Non-Bayesian to DeGroot nodes in a network.  To simulate the spread of information throughout the network, only 50\% of the Non-Bayesian received any signals; the other 50\% needed to rely completely on learning from their neighbors.  Each trial was run 100 times for each ratio percentage between from 1-100\%, for a total of 10,000 trials for each graph type.
+In order to characterize the effect of naive DeGroot nodes on Non-Bayesian social learning we simulated time taken for convergence versus the ratio of Non-Bayesian to DeGroot nodes in a network.  This simulation was performed for a several graph types: Barabasi-Albert preferential attachment~\cite{Barabasi}, Kleinberg small-world~\cite{KleinbergSmallWorld}, Eppstein power law~\cite{Eppstein}, and the complete graph.  To simulate the spread of information throughout the network, only 50\% of the Non-Bayesian received any signals; the other 50\% needed to rely completely on learning from their neighbors.  Each trial was run 100 times for each ratio percentage between from 1-100\%, for a total of 10,000 trials for each graph type.
 
 \begin{figure*}[t]
 %\hspace*{0.1in}
 %\centerline{\includegraphics[scale=0.8]{figures/nb_ratio}}
 \centering
 \includegraphics[width=0.9\textwidth]{figures/nb_ratio}
-\caption{@todo[DDC]}
+\caption{Time to convergence decreases as the ratio of Non-Bayesian to DeGroot nodes decreases}
 \label{fig:nb_ratio}
 \end{figure*}
 
-The data show a somewhat counterintuitive result: the presence of naive DeGroot nodes actually tends to accelerate the speed of convergence.  Further investigation showed this to be a result of the process used to convert DeGroot belief to Non-Bayesian belief.  The conversion method of section~\ref{sec:likelihood_metric} tends to result in a belief distribution that is heavily skewed to a single $\theta_i$.  This relative ``certainty'' of the DeGroot nodes is picked up by their Non-Bayesian neighbors, bringing them more quickly to convergence.
+The results, shown in figure~\ref{fig:nb_ratio}, are somewhat counterintuitive: the presence of naive DeGroot nodes actually tends to accelerate the speed of convergence.  Further investigation showed this to be a result of the process used to convert DeGroot belief to Non-Bayesian belief.  The conversion method of section~\ref{sec:likelihood_metric} tends to result in a belief distribution that is heavily skewed to a single $\theta_i$.  This relative ``certainty'' of the DeGroot nodes is picked up by their Non-Bayesian neighbors, bringing them more quickly to convergence.
+
+We can see this process in more detail in figure~\ref{fig:dg_faster}.
 
 \begin{figure}[th]
 %\hspace*{0.1in}
@@ -263,17 +265,18 @@ Thus we see that the presence of naive, non-observant agents in a graph can actu
 
 \subsection{Graph Size vs. Convergence Time}
 
-We also evaluated time to convergence versus graph size for several network types.  These simulations were performed with a ratio of 0.8 Non-Bayesian to DeGroot nodes, where 60\% of Non-Bayesian nodes received signals from the true probability distribution and 40\% had to rely completely on information from neighbors.
+We also evaluated time to convergence versus graph size for each of the network types tested in section~\ref{sec:node_ratio_vs_convergence_time}.  These simulations were performed with a ratio of 0.8 Non-Bayesian to DeGroot nodes, where 60\% of Non-Bayesian nodes received signals from the true probability distribution and 40\% had to rely completely on information from neighbors.
 
 \begin{figure*}[h]
 %\hspace*{0.1in}
 %\centerline{\includegraphics[scale=0.8]{figures/convergence_time}}
 \centering
 \includegraphics[width=.9\textwidth]{figures/convergence_time}
-\caption{@todo[DDC]}
+\caption{Time to convergence increases linearly with the size of the graph}
+\label{fig:convergence_time}
 \end{figure*}
 
-Time required for convergence appears to be linear with respect to the number of nodes in the graph.
+The results, shown in figure~\ref{fig:convergence_time}, show that time required for convergence appears to be linear with respect to the number of nodes in the graph.
 
 \section{Conclusion}
 
