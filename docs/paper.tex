@@ -285,7 +285,13 @@ In essence, this happens because the belief estimation algorithm of the DeGroot 
 
 We also evaluated time to convergence versus graph size for each of the network types tested in section~\ref{sec:node_ratio_vs_convergence_time}.  These simulations were performed with a ratio of 0.8 Non-Bayesian to DeGroot nodes, where 60\% of Non-Bayesian nodes received signals from the true probability distribution and 40\% had to rely completely on information from neighbors.
 
-The results, shown in Figure~\ref{fig:convergence_time}, show that time required for convergence appears to be linear with respect to the number of nodes in the graph.
+The results, presented in Figure~\ref{fig:convergence_time}, show that time required for convergence appears to be linear with respect to the number of nodes in the graph. Additionally, we can see that the complete graph takes longer to converge than the other graph types. This seems counter-intuitive at first: wouldn't a complete graph diffuse information more quickly, and threfore decrease the convergence time? The answer is that a complete graph has a large ``inertia''. To see that, imagine a graph comprised entirely of Non-Bayesian nodes that is trying to distinguish between two distributions $m_1$ and $m_2$. Let's say that node $i$ is the first one to receive a signal, and suppose that after the Bayesian update node $i$'s belief in $m_1$ is $p$. For the sake of concreteness, assume that $a_{ij}=1/(n+1)$ where $n$ is the number of node $i$'s neighbors. Then by Equation~\ref{eq:non_bayesian_update}:
+
+\begin{equation*}
+\mu_{i,t+1}(\theta_1) = \frac{p}{n+1} + \frac{n}{n+1}\left(\frac{1}{2}\right) = \frac{2p + n}{2n + 1} 
+\end{equation*}
+
+Therefore, as $n$ grows $\mu_{i,t+1}(\theta_1)$ tends towards 0.5. Naturally, there is a ripple effect: because node $i$'s belief update was attenuated, it will exert a smaller influence on its neighbors. This explains why the complete graph converges more slowly, since $n$ is larger than in any other graph type.
 
 \section{Conclusion}
 
